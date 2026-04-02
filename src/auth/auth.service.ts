@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -37,8 +38,8 @@ export class AuthService {
       data: {
         email: dto.email,
         username: dto.username,
-        firstName: dto.firstName,
-        lastName: dto.lastName,
+        nom: dto.nom,
+        prenom: dto.prenom,
         password: hashedPassword,
       },
     });
@@ -53,6 +54,10 @@ export class AuthService {
 
     if (!user) {
       throw new UnauthorizedException('Invalid email or password');
+    }
+
+    if (user.estSuspendu) {
+      throw new ForbiddenException('Compte suspendu');
     }
 
     const isPasswordValid = await bcrypt.compare(dto.password, user.password);

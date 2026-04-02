@@ -10,11 +10,11 @@ export class RegisterDto {
 
   @IsString()
   @IsNotEmpty()
-  firstName: string;
+  nom: string;
 
   @IsString()
   @IsNotEmpty()
-  lastName: string;
+  prenom: string;
 
   @IsString()
   @MinLength(6)

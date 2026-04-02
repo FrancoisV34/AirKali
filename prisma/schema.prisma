@@ -7,19 +7,89 @@ datasource db {
 }
 
 enum Role {
-  USER
+  UTILISATEUR
   ADMIN
-  MODO
+}
+
+enum CollecteType {
+  AIR
+  METEO
+  POPULATION
+}
+
+enum CollecteStatut {
+  SUCCESS
+  ERROR
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  username  String   @unique
-  firstName String
-  lastName  String
-  password  String
-  role      Role     @default(USER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             Int      @id @default(autoincrement())
+  email          String   @unique
+  username       String   @unique
+  nom            String
+  prenom         String
+  password       String
+  role           Role     @default(UTILISATEUR)
+  adressePostale String?
+  estSuspendu    Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Commune {
+  id          Int       @id @default(autoincrement())
+  nom         String
+  codePostal  String
+  codeInsee   String    @unique
+  population  Int?
+  latitude    Decimal   @db.Decimal(9, 6)
+  longitude   Decimal   @db.Decimal(9, 6)
+  active      Boolean   @default(false)
+  activatedAt DateTime?
+
+  donneesAir   DonneeAir[]
+  donneesMeteo DonneeMeteo[]
+
+  @@index([nom])
+  @@index([codePostal])
+}
+
+model DonneeAir {
+  id            Int      @id @default(autoincrement())
+  communeId     Int
+  ozone         Float?
+  co            Float?
+  pm25          Float?
+  pm10          Float?
+  indiceQualite Int?
+  dateHeure     DateTime
+
+  commune Commune @relation(fields: [communeId], references: [id])
+
+  @@index([communeId, dateHeure])
+}
+
+model DonneeMeteo {
+  id          Int      @id @default(autoincrement())
+  communeId   Int
+  temperature Float?
+  pression    Float?
+  humidite    Float?
+  meteoCiel   String?
+  vitesseVent Float?
+  dateHeure   DateTime
+
+  commune Commune @relation(fields: [communeId], references: [id])
+
+  @@index([communeId, dateHeure])
+}
+
+model LogCollecte {
+  id               Int            @id @default(autoincrement())
+  type             CollecteType
+  statut           CollecteStatut
+  communesTraitees Int
+  communesErreur   Int            @default(0)
+  dureeMs          Int
+  dateExecution    DateTime       @default(now())
 }
