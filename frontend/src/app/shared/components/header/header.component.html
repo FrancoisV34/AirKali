@@ -1,0 +1,24 @@
+<mat-toolbar color="primary" class="header">
+  <a routerLink="/" class="logo">Breath for All</a>
+
+  <span class="spacer"></span>
+
+  <nav class="nav-links">
+    <a mat-button routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+      <mat-icon>home</mat-icon>
+      <span class="nav-label">Accueil</span>
+    </a>
+    <a mat-button routerLink="/forum" routerLinkActive="active">
+      <mat-icon>forum</mat-icon>
+      <span class="nav-label">Forum</span>
+    </a>
+    <a mat-button routerLink="/recherche" routerLinkActive="active">
+      <mat-icon>search</mat-icon>
+      <span class="nav-label">Recherche</span>
+    </a>
+    <a mat-button routerLink="/connexion" routerLinkActive="active">
+      <mat-icon>login</mat-icon>
+      <span class="nav-label">Connexion</span>
+    </a>
+  </nav>
+</mat-toolbar>

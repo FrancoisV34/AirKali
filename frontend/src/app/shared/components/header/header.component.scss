@@ -1,0 +1,36 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.logo {
+  font-size: 1.4rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: inherit;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.nav-links a {
+  color: inherit;
+  text-decoration: none;
+
+  mat-icon {
+    margin-right: 4px;
+    vertical-align: middle;
+  }
+
+  &.active {
+    border-bottom: 2px solid white;
+  }
+}
+
+@media (max-width: 1399px) {
+  .nav-label {
+    display: none;
+  }
+}
