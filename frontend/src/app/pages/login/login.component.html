@@ -1,0 +1,49 @@
+<div class="auth-container">
+  <h2>Connexion</h2>
+
+  <div class="server-error" *ngIf="serverError">
+    {{ serverError }}
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <mat-form-field appearance="outline">
+      <mat-label>Email</mat-label>
+      <input matInput type="email" formControlName="email" />
+      <mat-error *ngIf="form.get('email')?.hasError('required')">
+        L'email est requis
+      </mat-error>
+      <mat-error *ngIf="form.get('email')?.hasError('email')">
+        Format d'email invalide
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Mot de passe</mat-label>
+      <input
+        matInput
+        [type]="hidePassword ? 'password' : 'text'"
+        formControlName="password"
+      />
+      <button
+        mat-icon-button
+        matSuffix
+        type="button"
+        (click)="hidePassword = !hidePassword"
+      >
+        <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+      </button>
+      <mat-error *ngIf="form.get('password')?.hasError('required')">
+        Le mot de passe est requis
+      </mat-error>
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" type="submit" class="submit-btn">
+      Se connecter
+    </button>
+  </form>
+
+  <p class="auth-link">
+    Pas encore de compte ?
+    <a routerLink="/inscription">S'inscrire</a>
+  </p>
+</div>

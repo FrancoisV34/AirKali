@@ -1,0 +1,72 @@
+<div class="profil-container" *ngIf="!loading">
+  <h2>Mon profil</h2>
+
+  <div class="server-error" *ngIf="serverError">
+    {{ serverError }}
+  </div>
+
+  <div class="success-message" *ngIf="successMessage">
+    {{ successMessage }}
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="profile">
+    <mat-form-field appearance="outline">
+      <mat-label>Nom</mat-label>
+      <input matInput formControlName="nom" />
+      <mat-error *ngIf="form.get('nom')?.hasError('required')">
+        Le nom est requis
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Prénom</mat-label>
+      <input matInput formControlName="prenom" />
+      <mat-error *ngIf="form.get('prenom')?.hasError('required')">
+        Le prénom est requis
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Nom d'utilisateur</mat-label>
+      <input matInput formControlName="username" />
+      <mat-error *ngIf="form.get('username')?.hasError('required')">
+        Le nom d'utilisateur est requis
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Email</mat-label>
+      <input matInput type="email" formControlName="email" />
+      <mat-error *ngIf="form.get('email')?.hasError('required')">
+        L'email est requis
+      </mat-error>
+      <mat-error *ngIf="form.get('email')?.hasError('email')">
+        Format d'email invalide
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Adresse postale</mat-label>
+      <input matInput formControlName="adressePostale" />
+    </mat-form-field>
+
+    <div class="readonly-fields">
+      <div class="readonly-field">
+        <span class="field-label">Rôle</span>
+        <span class="field-value">{{ profile.role }}</span>
+      </div>
+      <div class="readonly-field">
+        <span class="field-label">Membre depuis</span>
+        <span class="field-value">{{ profile.createdAt | date:'dd/MM/yyyy' }}</span>
+      </div>
+    </div>
+
+    <button mat-raised-button color="primary" type="submit" class="submit-btn">
+      Sauvegarder
+    </button>
+  </form>
+</div>
+
+<div class="profil-container loading" *ngIf="loading">
+  <p>Chargement du profil...</p>
+</div>

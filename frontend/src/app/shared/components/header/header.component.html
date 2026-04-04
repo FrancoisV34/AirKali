@@ -16,9 +16,23 @@
       <mat-icon>search</mat-icon>
       <span class="nav-label">Recherche</span>
     </a>
-    <a mat-button routerLink="/connexion" routerLinkActive="active">
-      <mat-icon>login</mat-icon>
-      <span class="nav-label">Connexion</span>
-    </a>
+
+    <ng-container *ngIf="(authService.isLoggedIn$ | async); else notLoggedIn">
+      <a mat-button routerLink="/profil" routerLinkActive="active">
+        <mat-icon>person</mat-icon>
+        <span class="nav-label">Mon profil</span>
+      </a>
+      <button mat-button (click)="onLogout()">
+        <mat-icon>logout</mat-icon>
+        <span class="nav-label">Déconnexion</span>
+      </button>
+    </ng-container>
+
+    <ng-template #notLoggedIn>
+      <a mat-button routerLink="/connexion" routerLinkActive="active">
+        <mat-icon>login</mat-icon>
+        <span class="nav-label">Connexion</span>
+      </a>
+    </ng-template>
   </nav>
 </mat-toolbar>
