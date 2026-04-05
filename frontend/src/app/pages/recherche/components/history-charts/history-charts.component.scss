@@ -1,0 +1,36 @@
+.charts-section {
+  margin-top: 24px;
+  padding: 16px;
+  background: #fafafa;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+
+  h3 {
+    margin: 0 0 16px;
+  }
+
+  &.no-active {
+    text-align: center;
+    color: #999;
+    padding: 32px;
+  }
+}
+
+.chart-controls {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.chart-container {
+  height: 350px;
+  position: relative;
+}
+
+.chart-loading,
+.no-history {
+  text-align: center;
+  padding: 40px;
+  color: #999;
+}

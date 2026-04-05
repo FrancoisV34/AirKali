@@ -1,0 +1,12 @@
+<mat-form-field appearance="outline" class="fav-select" *ngIf="isLoggedIn">
+  <mat-label>Mes favoris</mat-label>
+  <mat-icon matPrefix>star</mat-icon>
+  <mat-select (selectionChange)="onSelect($event.value)">
+    <mat-option *ngFor="let fav of favorites" [value]="fav">
+      {{ fav.commune.nom }} — {{ fav.commune.codePostal }}
+    </mat-option>
+    <mat-option *ngIf="favorites.length === 0" disabled>
+      Aucun favori
+    </mat-option>
+  </mat-select>
+</mat-form-field>

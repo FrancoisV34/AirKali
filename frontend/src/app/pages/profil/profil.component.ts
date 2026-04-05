@@ -9,11 +9,14 @@ import {
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
 import {
   AuthService,
   UpdateProfileData,
   UserProfile,
 } from '../../core/services/auth.service';
+import { Favorite, FavoriteService } from '../../core/services/favorite.service';
 import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
@@ -25,6 +28,8 @@ import { HttpErrorResponse } from '@angular/common/http';
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
+    MatIconModule,
+    MatCardModule,
   ],
   templateUrl: './profil.component.html',
   styleUrl: './profil.component.scss',
@@ -35,10 +40,12 @@ export class ProfilComponent implements OnInit {
   serverError = '';
   successMessage = '';
   loading = true;
+  favorites: Favorite[] = [];
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
+    private favoriteService: FavoriteService,
   ) {}
 
   ngOnInit(): void {
@@ -48,6 +55,11 @@ export class ProfilComponent implements OnInit {
       username: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
       adressePostale: [''],
+    });
+
+    this.favoriteService.loadFavorites();
+    this.favoriteService.favorites$.subscribe((favs) => {
+      this.favorites = favs;
     });
 
     this.authService.getCurrentUser().subscribe({
@@ -94,5 +106,9 @@ export class ProfilComponent implements OnInit {
         }
       },
     });
+  }
+
+  onRemoveFavorite(communeId: number): void {
+    this.favoriteService.removeFavorite(communeId).subscribe();
   }
 }

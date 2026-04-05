@@ -1,0 +1,103 @@
+<div class="data-panel" *ngIf="commune; else emptyState">
+  <h3>{{ commune.nom }} <small>({{ commune.codePostal }})</small></h3>
+
+  <div class="commune-info" *ngIf="commune.population">
+    <span>Population : {{ commune.population | number }}</span>
+  </div>
+
+  <div class="actions">
+    <button
+      *ngIf="isLoggedIn && !isFavorite"
+      mat-raised-button
+      color="primary"
+      (click)="onToggleFavorite()"
+      [disabled]="favoritesCount >= 10"
+      [matTooltip]="favoritesCount >= 10 ? 'Limite de 10 favoris atteinte' : ''"
+    >
+      <mat-icon>star_border</mat-icon>
+      Ajouter aux favoris
+    </button>
+    <button
+      *ngIf="isLoggedIn && isFavorite"
+      mat-raised-button
+      color="warn"
+      (click)="onToggleFavorite()"
+    >
+      <mat-icon>star</mat-icon>
+      Retirer des favoris
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="loading-data">
+    Chargement des données...
+  </div>
+
+  <div *ngIf="!loading && !airData && !meteoData && !isActive" class="no-data">
+    <p>Pas de données disponibles pour cette commune.</p>
+    <button mat-stroked-button color="primary" (click)="onFetchData()">
+      <mat-icon>cloud_download</mat-icon>
+      Récupérer les données
+    </button>
+    <p class="hint" *ngIf="isLoggedIn">
+      Ajoutez en favori pour consulter l'historique
+    </p>
+  </div>
+
+  <mat-tab-group *ngIf="!loading && (airData || meteoData)">
+    <mat-tab label="Qualité de l'air" *ngIf="airData">
+      <div class="tab-content">
+        <div class="data-row">
+          <span class="label">Indice ATMO européen</span>
+          <span class="value">{{ airData.indiceQualite ?? '—' }}</span>
+        </div>
+        <div class="data-row">
+          <span class="label">PM2.5 (µg/m³)</span>
+          <span class="value">{{ airData.pm25 ?? '—' }}</span>
+        </div>
+        <div class="data-row">
+          <span class="label">PM10 (µg/m³)</span>
+          <span class="value">{{ airData.pm10 ?? '—' }}</span>
+        </div>
+        <div class="data-row">
+          <span class="label">O₃ (µg/m³)</span>
+          <span class="value">{{ airData.ozone ?? '—' }}</span>
+        </div>
+        <div class="data-row">
+          <span class="label">CO (µg/m³)</span>
+          <span class="value">{{ airData.co ?? '—' }}</span>
+        </div>
+      </div>
+    </mat-tab>
+    <mat-tab label="Météo" *ngIf="meteoData">
+      <div class="tab-content">
+        <div class="data-row">
+          <span class="label">Température</span>
+          <span class="value">{{ meteoData.temperature ?? '—' }} °C</span>
+        </div>
+        <div class="data-row">
+          <span class="label">Humidité</span>
+          <span class="value">{{ meteoData.humidite ?? '—' }} %</span>
+        </div>
+        <div class="data-row">
+          <span class="label">Vent</span>
+          <span class="value">{{ meteoData.vitesseVent ?? '—' }} km/h</span>
+        </div>
+        <div class="data-row">
+          <span class="label">Pression</span>
+          <span class="value">{{ meteoData.pression ?? '—' }} hPa</span>
+        </div>
+        <div class="data-row">
+          <span class="label">Ciel</span>
+          <span class="value">{{ meteoData.meteoCiel ?? '—' }}</span>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>
+
+<ng-template #emptyState>
+  <div class="data-panel empty">
+    <mat-icon class="empty-icon">place</mat-icon>
+    <p>Sélectionnez une commune pour voir ses données</p>
+  </div>
+</ng-template>

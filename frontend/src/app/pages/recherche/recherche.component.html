@@ -1,0 +1,32 @@
+<div class="recherche-page">
+  <div class="toolbar">
+    <app-search-bar (communeSelected)="onCommuneSelected($event)"></app-search-bar>
+    <app-favorites-select (favoriteSelected)="onCommuneSelected($event)"></app-favorites-select>
+  </div>
+
+  <div class="main-content">
+    <div class="map-section">
+      <app-map (markerClicked)="onMarkerClicked($event)"></app-map>
+    </div>
+    <div class="panel-section">
+      <app-data-panel
+        [commune]="selectedCommune"
+        [airData]="airData"
+        [meteoData]="meteoData"
+        [isFavorite]="selectedCommune ? favoriteService.isFavorite(selectedCommune.id) : false"
+        [favoritesCount]="favoriteService.count"
+        [isLoggedIn]="isLoggedIn"
+        [isActive]="selectedCommune?.active ?? false"
+        [loading]="dataLoading"
+        (addFavorite)="onAddFavorite($event)"
+        (removeFavorite)="onRemoveFavorite($event)"
+        (fetchData)="onFetchData($event)"
+      ></app-data-panel>
+    </div>
+  </div>
+
+  <app-history-charts
+    [communeId]="selectedCommune?.id ?? null"
+    [isActive]="selectedCommune?.active ?? false"
+  ></app-history-charts>
+</div>

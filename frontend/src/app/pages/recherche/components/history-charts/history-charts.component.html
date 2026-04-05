@@ -1,0 +1,43 @@
+<div class="charts-section" *ngIf="communeId && isActive">
+  <h3>Historique</h3>
+
+  <div class="chart-controls">
+    <mat-button-toggle-group [value]="chartType" (change)="onChartTypeChange($event.value)">
+      <mat-button-toggle value="air">Qualité de l'air</mat-button-toggle>
+      <mat-button-toggle value="meteo">Météo</mat-button-toggle>
+    </mat-button-toggle-group>
+
+    <mat-button-toggle-group [value]="period" (change)="onPeriodChange($event.value)">
+      <mat-button-toggle value="7">7 jours</mat-button-toggle>
+      <mat-button-toggle value="30">30 jours</mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
+
+  <div class="chart-container" *ngIf="!loading">
+    <canvas
+      *ngIf="chartType === 'air' && airChartData"
+      baseChart
+      type="line"
+      [data]="airChartData"
+      [options]="chartOptions"
+    ></canvas>
+    <canvas
+      *ngIf="chartType === 'meteo' && meteoChartData"
+      baseChart
+      type="line"
+      [data]="meteoChartData"
+      [options]="chartOptions"
+    ></canvas>
+    <p *ngIf="(chartType === 'air' && !airChartData) || (chartType === 'meteo' && !meteoChartData)" class="no-history">
+      Aucune donnée historique disponible
+    </p>
+  </div>
+
+  <div *ngIf="loading" class="chart-loading">
+    Chargement des données historiques...
+  </div>
+</div>
+
+<div class="charts-section no-active" *ngIf="communeId && !isActive">
+  <p>Ajoutez cette commune en favori pour consulter l'historique des données</p>
+</div>

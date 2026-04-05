@@ -67,6 +67,28 @@
   </form>
 </div>
 
+<div class="profil-container" *ngIf="!loading">
+  <h2>Mes favoris</h2>
+
+  <div class="favorites-list" *ngIf="favorites.length > 0">
+    <mat-card *ngFor="let fav of favorites" class="favorite-card">
+      <mat-card-content>
+        <div class="fav-info">
+          <strong>{{ fav.commune.nom }}</strong>
+          <span>{{ fav.commune.codePostal }}</span>
+        </div>
+        <button mat-icon-button color="warn" (click)="onRemoveFavorite(fav.communeId)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <p *ngIf="favorites.length === 0" class="no-favorites">
+    Aucun favori pour le moment
+  </p>
+</div>
+
 <div class="profil-container loading" *ngIf="loading">
   <p>Chargement du profil...</p>
 </div>

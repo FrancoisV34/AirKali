@@ -1,0 +1,38 @@
+.recherche-page {
+  max-width: 1200px;
+  margin: 24px auto;
+  padding: 0 24px;
+}
+
+.toolbar {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.main-content {
+  display: flex;
+  gap: 16px;
+
+  .map-section {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .panel-section {
+    width: 350px;
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 1024px) {
+  .main-content {
+    flex-direction: column;
+
+    .panel-section {
+      width: 100%;
+    }
+  }
+}

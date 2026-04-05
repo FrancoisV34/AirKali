@@ -1,6 +1,6 @@
 .profil-container {
-  max-width: 450px;
-  margin: 60px auto;
+  max-width: 500px;
+  margin: 40px auto;
   padding: 0 24px;
 
   h2 {
@@ -71,4 +71,35 @@ form {
       color: #333;
     }
   }
+}
+
+.favorites-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.favorite-card {
+  mat-card-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 16px !important;
+  }
+
+  .fav-info {
+    display: flex;
+    flex-direction: column;
+
+    span {
+      font-size: 12px;
+      color: #666;
+    }
+  }
+}
+
+.no-favorites {
+  text-align: center;
+  color: #999;
+  padding: 16px;
 }

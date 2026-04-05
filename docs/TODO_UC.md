@@ -1,0 +1,46 @@
+# TODO — Cas d'utilisation Breath for All
+
+Référence : Dossier des spécifications générales BfA (20/03/2026)
+
+## P1 — Priorité haute
+
+| UC | Titre | Statut | Spec |
+|----|-------|--------|------|
+| UC6 | Créer un compte | DONE | SPEC_001 + SPEC_004 |
+| UC7 | Se connecter | DONE | SPEC_001 + SPEC_004 |
+| UC2 | Rechercher une commune (backend) | DONE | SPEC_002 |
+| UC17 | Récupérer données qualité de l'air (cron) | DONE | SPEC_002 |
+| UC18 | Récupérer données météo (cron) | DONE | SPEC_002 |
+| UC19 | Récupérer données recensement (cron) | DONE | SPEC_002 |
+| UC20 | Historiser les données | DONE | SPEC_002 |
+| UC1 | Consulter la carte interactive (marqueurs ATMO, MarkerCluster, popups) | TODO | — |
+| UC2 | Rechercher une commune (frontend : barre recherche, résultats, affichage données) | TODO | — |
+| UC5 | Voir courbes d'historique (graphes air/météo, sélection période, max 90j) | TODO | — |
+
+## P2 — Priorité moyenne
+
+| UC | Titre | Statut | Spec |
+|----|-------|--------|------|
+| UC8 | Gérer ses favoris (ajout/suppression communes, activation cron) | TODO | — |
+| UC9 | Créer un topic (forum, titre max 255 car., contenu obligatoire) | TODO | — |
+| UC10 | Poster un commentaire (réponse à topic actif) | TODO | — |
+| UC11 | Voter sur le forum (+/- toggle, pas d'auto-vote) | TODO | — |
+| UC13 | Modérer le forum (soft delete messages) | TODO | — |
+| UC14 | Supprimer des messages (admin) | TODO | — |
+| UC15 | Suspendre un utilisateur (mécanisme backend) | DONE | SPEC_001 |
+| UC15 | Suspendre un utilisateur (interface admin) | TODO | — |
+| UC16 | Émettre alertes/notifications email (admin, niveaux INFO/WARNING/CRITICAL) | TODO | — |
+
+## P3 — Priorité basse
+
+| UC | Titre | Statut | Spec |
+|----|-------|--------|------|
+| UC4 | Exporter PDF/CSV (données historiques commune + période) | TODO | — |
+| UC12 | Gérer sa localisation (adresse postale → commune/département/région) | TODO | — |
+| UC_DISCO | Se déconnecter | DONE | SPEC_004 |
+
+## Résumé
+
+- **DONE** : 10 UC
+- **TODO** : 13 UC
+- **Specs rédigées** : SPEC_001, SPEC_002, SPEC_003, SPEC_004

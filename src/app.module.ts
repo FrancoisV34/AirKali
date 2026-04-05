@@ -8,6 +8,7 @@ import { CommuneModule } from './commune/commune.module';
 import { AirQualityModule } from './air-quality/air-quality.module';
 import { MeteoModule } from './meteo/meteo.module';
 import { CollecteModule } from './collecte/collecte.module';
+import { FavoriteModule } from './favorite/favorite.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { CollecteModule } from './collecte/collecte.module';
     AirQualityModule,
     MeteoModule,
     CollecteModule,
+    FavoriteModule,
   ],
 })
 export class AppModule {}
