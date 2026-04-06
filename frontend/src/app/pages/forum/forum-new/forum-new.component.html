@@ -1,0 +1,71 @@
+<div class="forum-form-container">
+  <div class="form-header">
+    <a routerLink="/forum" class="back-link">
+      <mat-icon>arrow_back</mat-icon>
+      Retour au forum
+    </a>
+    <h1>Nouveau topic</h1>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" class="topic-form">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Titre</mat-label>
+      <input matInput formControlName="title" placeholder="Titre du topic (5-255 caractères)" />
+      <mat-error *ngIf="titleControl.hasError('required')">Le titre est obligatoire</mat-error>
+      <mat-error *ngIf="titleControl.hasError('minlength')">Minimum 5 caractères</mat-error>
+      <mat-error *ngIf="titleControl.hasError('maxlength')">Maximum 255 caractères</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Catégorie (optionnel)</mat-label>
+      <mat-select formControlName="categoryId">
+        <mat-option [value]="null">Aucune</mat-option>
+        <mat-option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <div class="content-section">
+      <div class="content-tabs">
+        <button type="button" mat-button [class.active-tab]="!previewMode" (click)="previewMode = false">
+          Écrire
+        </button>
+        <button type="button" mat-button [class.active-tab]="previewMode" (click)="previewMode = true">
+          Aperçu
+        </button>
+      </div>
+
+      <div *ngIf="!previewMode">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Contenu</mat-label>
+          <textarea
+            matInput
+            formControlName="content"
+            rows="12"
+            placeholder="Contenu du topic (markdown supporté : **gras**, *italique*, [lien](url))"
+          ></textarea>
+          <mat-error *ngIf="contentControl.hasError('required')">Le contenu est obligatoire</mat-error>
+          <mat-error *ngIf="contentControl.hasError('minlength')">Minimum 2 caractères</mat-error>
+          <mat-error *ngIf="contentControl.hasError('maxlength')">Maximum 2000 caractères</mat-error>
+        </mat-form-field>
+        <div class="char-count">{{ contentControl.value?.length ?? 0 }}/2000</div>
+      </div>
+
+      <div *ngIf="previewMode" class="markdown-preview" [innerHTML]="contentControl.value | safeMarkdown">
+      </div>
+    </div>
+
+    <div class="error-msg" *ngIf="errorMsg">{{ errorMsg }}</div>
+
+    <div class="form-actions">
+      <a mat-stroked-button routerLink="/forum">Annuler</a>
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        [disabled]="form.invalid || submitting"
+      >
+        Publier
+      </button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,212 @@
+<div class="forum-detail-container" *ngIf="!loading; else spinner">
+  <a routerLink="/forum" class="back-link">
+    <mat-icon>arrow_back</mat-icon>
+    Retour au forum
+  </a>
+
+  <div class="topic-section" *ngIf="topic">
+    <div class="topic-header">
+      <div class="topic-title-row">
+        <h1>{{ topic.title }}</h1>
+        <span class="category-badge" *ngIf="topic.category">{{ topic.category.name }}</span>
+      </div>
+      <div class="topic-meta">
+        <span>Par <strong>{{ topic.author.pseudo }}</strong></span>
+        <span>{{ topic.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+        <span *ngIf="topic.isEdited" class="edited-tag">(modifié)</span>
+      </div>
+    </div>
+
+    <div class="topic-content" [innerHTML]="topic.content | safeMarkdown"></div>
+
+    <div class="topic-actions">
+      <div class="vote-buttons" *ngIf="canVote() && !isTopicAuthor()">
+        <button
+          mat-icon-button
+          class="vote-btn upvote"
+          [class.active]="topic.userVote === 1"
+          (click)="voteOnTopic(1)"
+          title="Voter pour"
+        >
+          <mat-icon>thumb_up</mat-icon>
+        </button>
+        <span class="score">{{ topic.score }}</span>
+        <button
+          mat-icon-button
+          class="vote-btn downvote"
+          [class.active]="topic.userVote === -1"
+          (click)="voteOnTopic(-1)"
+          title="Voter contre"
+        >
+          <mat-icon>thumb_down</mat-icon>
+        </button>
+      </div>
+      <span class="score-display" *ngIf="!canVote() || isTopicAuthor()">Score : {{ topic.score }}</span>
+
+      <a
+        mat-stroked-button
+        *ngIf="canEditTopic()"
+        [routerLink]="['/forum', topic.id, 'edit']"
+      >
+        <mat-icon>edit</mat-icon>
+        Modifier
+      </a>
+    </div>
+  </div>
+
+  <div class="comments-section">
+    <h2>Commentaires ({{ commentsTotal }})</h2>
+
+    <div class="new-comment" *ngIf="canPostComment()">
+      <div class="reply-indicator" *ngIf="replyingTo">
+        <span>En réponse à <strong>@{{ replyingTo.pseudo }}</strong></span>
+        <button mat-icon-button (click)="cancelReply()" title="Annuler la réponse">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      <textarea
+        [(ngModel)]="newCommentContent"
+        placeholder="Écrire un commentaire..."
+        rows="4"
+        maxlength="2000"
+        class="comment-textarea"
+      ></textarea>
+      <div class="comment-form-actions">
+        <span class="char-count">{{ newCommentContent.length }}/2000</span>
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="submitComment()"
+          [disabled]="newCommentContent.trim().length < 2"
+        >
+          {{ replyingTo ? 'Répondre' : 'Commenter' }}
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="loadingComments" class="loading-spinner">
+      <mat-spinner diameter="32"></mat-spinner>
+    </div>
+
+    <div *ngIf="!loadingComments" class="comments-tree">
+      <ng-container *ngFor="let comment of comments">
+        <ng-container
+          *ngTemplateOutlet="commentTpl; context: { $implicit: comment, depth: 1 }"
+        ></ng-container>
+      </ng-container>
+    </div>
+
+    <div class="pagination" *ngIf="totalCommentPages > 1">
+      <button mat-button (click)="prevPage()" [disabled]="commentsPage === 1">
+        <mat-icon>chevron_left</mat-icon>
+        Précédent
+      </button>
+      <span>Page {{ commentsPage }} / {{ totalCommentPages }}</span>
+      <button mat-button (click)="nextPage()" [disabled]="commentsPage === totalCommentPages">
+        Suivant
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+    </div>
+  </div>
+</div>
+
+<ng-template #spinner>
+  <div class="loading-spinner">
+    <mat-spinner diameter="48"></mat-spinner>
+  </div>
+</ng-template>
+
+<ng-template #commentTpl let-comment let-depth="depth">
+  <div
+    class="comment"
+    [class.depth-1]="depth === 1"
+    [class.depth-2]="depth === 2"
+    [class.depth-3]="depth === 3"
+    [class.tablet-mode]="isTablet && depth > 1"
+  >
+    <div class="comment-header">
+      <strong>{{ comment.author.pseudo }}</strong>
+      <span class="comment-date">{{ comment.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+      <span *ngIf="comment.isEdited" class="edited-tag">(modifié)</span>
+      <span *ngIf="isTablet && comment.parentId" class="reply-tag">
+        en réponse à un commentaire
+      </span>
+    </div>
+
+    <div *ngIf="editingCommentId !== comment.id; else editTpl">
+      <div class="comment-content" [innerHTML]="comment.content | safeMarkdown"></div>
+    </div>
+
+    <ng-template #editTpl>
+      <textarea
+        [(ngModel)]="editingCommentContent"
+        rows="3"
+        maxlength="2000"
+        class="comment-textarea"
+      ></textarea>
+      <div class="comment-form-actions">
+        <button mat-button (click)="cancelEditComment()">Annuler</button>
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="saveEditComment(comment)"
+          [disabled]="editingCommentContent.trim().length < 2"
+        >
+          Enregistrer
+        </button>
+      </div>
+    </ng-template>
+
+    <div class="comment-actions">
+      <div class="vote-buttons" *ngIf="canVote() && !isCommentAuthor(comment)">
+        <button
+          mat-icon-button
+          class="vote-btn upvote"
+          [class.active]="comment.userVote === 1"
+          (click)="voteOnComment(comment, 1)"
+          title="Voter pour"
+        >
+          <mat-icon>thumb_up</mat-icon>
+        </button>
+        <span class="score">{{ comment.score }}</span>
+        <button
+          mat-icon-button
+          class="vote-btn downvote"
+          [class.active]="comment.userVote === -1"
+          (click)="voteOnComment(comment, -1)"
+          title="Voter contre"
+        >
+          <mat-icon>thumb_down</mat-icon>
+        </button>
+      </div>
+      <span class="score-only" *ngIf="!canVote() || isCommentAuthor(comment)">{{ comment.score }}</span>
+
+      <button
+        mat-button
+        *ngIf="canPostComment() && depth < 3"
+        (click)="startReply(comment)"
+        class="reply-btn"
+      >
+        <mat-icon>reply</mat-icon>
+        Répondre
+      </button>
+
+      <button
+        mat-button
+        *ngIf="canEditComment(comment)"
+        (click)="startEditComment(comment)"
+      >
+        <mat-icon>edit</mat-icon>
+        Modifier
+      </button>
+    </div>
+
+    <div class="comment-children" *ngIf="comment.children && comment.children.length > 0">
+      <ng-container *ngFor="let child of comment.children">
+        <ng-container
+          *ngTemplateOutlet="commentTpl; context: { $implicit: child, depth: depth + 1 }"
+        ></ng-container>
+      </ng-container>
+    </div>
+  </div>
+</ng-template>

@@ -10,7 +10,32 @@ export const routes: Routes = [
   {
     path: 'forum',
     loadComponent: () =>
-      import('./pages/forum/forum.component').then((m) => m.ForumComponent),
+      import('./pages/forum/forum-list/forum-list.component').then(
+        (m) => m.ForumListComponent,
+      ),
+  },
+  {
+    path: 'forum/new',
+    loadComponent: () =>
+      import('./pages/forum/forum-new/forum-new.component').then(
+        (m) => m.ForumNewComponent,
+      ),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'forum/:id/edit',
+    loadComponent: () =>
+      import('./pages/forum/forum-edit/forum-edit.component').then(
+        (m) => m.ForumEditComponent,
+      ),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'forum/:id',
+    loadComponent: () =>
+      import('./pages/forum/forum-detail/forum-detail.component').then(
+        (m) => m.ForumDetailComponent,
+      ),
   },
   {
     path: 'recherche',

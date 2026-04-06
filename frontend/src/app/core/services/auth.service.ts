@@ -23,6 +23,7 @@ export interface UserProfile {
   nom: string;
   prenom: string;
   role: string;
+  estSuspendu: boolean;
   adressePostale: string | null;
   createdAt: string;
   updatedAt: string;
@@ -95,6 +96,24 @@ export class AuthService {
 
   getToken(): string | null {
     return localStorage.getItem(this.TOKEN_KEY);
+  }
+
+  getTokenPayload(): { sub: number; email: string; role: string } | null {
+    const token = this.getToken();
+    if (!token) return null;
+    try {
+      return JSON.parse(atob(token.split('.')[1]));
+    } catch {
+      return null;
+    }
+  }
+
+  getUserId(): number | null {
+    return this.getTokenPayload()?.sub ?? null;
+  }
+
+  getUserRole(): string | null {
+    return this.getTokenPayload()?.role ?? null;
   }
 
   getCurrentUser(): Observable<UserProfile> {

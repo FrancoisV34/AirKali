@@ -1,0 +1,85 @@
+<div class="forum-list-container">
+  <div class="forum-header">
+    <h1>Forum</h1>
+    <a mat-raised-button color="primary" routerLink="/forum/new" *ngIf="canCreateTopic()">
+      <mat-icon>add</mat-icon>
+      Nouveau topic
+    </a>
+  </div>
+
+  <div class="filters">
+    <mat-form-field appearance="outline" class="filter-field">
+      <mat-label>Catégorie</mat-label>
+      <mat-select [(ngModel)]="selectedCategoryId" (ngModelChange)="onCategoryChange()">
+        <mat-option [value]="undefined">Toutes</mat-option>
+        <mat-option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="filter-field">
+      <mat-label>Trier par</mat-label>
+      <mat-select [(ngModel)]="sort" (ngModelChange)="onSortChange()">
+        <mat-option value="recent">Plus récent</mat-option>
+        <mat-option value="popular">Plus populaire</mat-option>
+        <mat-option value="active">Plus actif</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <div *ngIf="loading" class="loading-spinner">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <div *ngIf="!loading" class="topics-list">
+    <div *ngIf="topics.length === 0" class="empty-state">
+      <mat-icon>forum</mat-icon>
+      <p>Aucun topic pour le moment. Soyez le premier à poster !</p>
+    </div>
+
+    <a
+      *ngFor="let topic of topics"
+      class="topic-card"
+      [routerLink]="['/forum', topic.id]"
+    >
+      <div class="topic-main">
+        <div class="topic-title-row">
+          <span class="topic-title">{{ topic.title }}</span>
+          <span class="category-badge" *ngIf="topic.category">{{ topic.category.name }}</span>
+        </div>
+        <p class="topic-excerpt">{{ topic.excerpt }}</p>
+        <div class="topic-meta">
+          <span class="meta-author">
+            <mat-icon class="meta-icon">person</mat-icon>
+            {{ topic.author.pseudo }}
+          </span>
+          <span class="meta-date">
+            <mat-icon class="meta-icon">schedule</mat-icon>
+            {{ topic.createdAt | date:'dd/MM/yyyy' }}
+          </span>
+        </div>
+      </div>
+      <div class="topic-stats">
+        <div class="stat">
+          <mat-icon>thumb_up</mat-icon>
+          <span>{{ topic.score }}</span>
+        </div>
+        <div class="stat">
+          <mat-icon>comment</mat-icon>
+          <span>{{ topic.commentCount }}</span>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <div class="pagination" *ngIf="totalPages > 1">
+    <button mat-button (click)="prevPage()" [disabled]="page === 1">
+      <mat-icon>chevron_left</mat-icon>
+      Précédent
+    </button>
+    <span class="page-info">Page {{ page }} / {{ totalPages }}</span>
+    <button mat-button (click)="nextPage()" [disabled]="page === totalPages">
+      Suivant
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+  </div>
+</div>

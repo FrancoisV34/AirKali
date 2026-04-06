@@ -9,6 +9,10 @@ import { AirQualityModule } from './air-quality/air-quality.module';
 import { MeteoModule } from './meteo/meteo.module';
 import { CollecteModule } from './collecte/collecte.module';
 import { FavoriteModule } from './favorite/favorite.module';
+import { CategoryModule } from './category/category.module';
+import { TopicModule } from './topic/topic.module';
+import { CommentModule } from './comment/comment.module';
+import { VoteModule } from './vote/vote.module';
 
 @Module({
   imports: [
@@ -22,6 +26,10 @@ import { FavoriteModule } from './favorite/favorite.module';
     MeteoModule,
     CollecteModule,
     FavoriteModule,
+    CategoryModule,
+    TopicModule,
+    CommentModule,
+    VoteModule,
   ],
 })
 export class AppModule {}
