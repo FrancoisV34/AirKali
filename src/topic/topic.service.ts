@@ -5,6 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { NotificationService } from '../notification/notification.service';
 import { CreateTopicDto } from './dto/create-topic.dto';
 import { UpdateTopicDto } from './dto/update-topic.dto';
 import { Role } from '../common/enums/role.enum';
@@ -15,6 +16,8 @@ const TOPIC_SELECT = {
   content: true,
   categoryId: true,
   userId: true,
+  status: true,
+  isClosed: true,
   createdAt: true,
   updatedAt: true,
   deletedAt: true,
@@ -24,7 +27,10 @@ const TOPIC_SELECT = {
 
 @Injectable()
 export class TopicService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notificationService: NotificationService,
+  ) {}
 
   async findAll(
     page: number,
@@ -32,10 +38,15 @@ export class TopicService {
     sort: string,
     categoryId?: number,
     requestingUserId?: number,
+    isAdmin = false,
   ) {
     const take = Math.min(limit, 20);
     const skip = (page - 1) * take;
-    const where = { deletedAt: null, ...(categoryId ? { categoryId } : {}) };
+    const where = {
+      deletedAt: null,
+      ...(!isAdmin ? { status: 'visible' } : {}),
+      ...(categoryId ? { categoryId } : {}),
+    };
 
     let orderBy: object;
     if (sort === 'popular') {
@@ -67,10 +78,14 @@ export class TopicService {
     }
 
     const topicIds2 = processed.map((t) => t.id);
+    const commentWhere = isAdmin
+      ? { topicId: { in: topicIds2 }, deletedAt: null }
+      : { topicId: { in: topicIds2 }, deletedAt: null, status: 'visible' };
+
     const [commentCounts, voteScores] = await Promise.all([
       this.prisma.comment.groupBy({
         by: ['topicId'],
-        where: { topicId: { in: topicIds2 }, deletedAt: null },
+        where: commentWhere,
         _count: { id: true },
       }),
       this.prisma.vote.groupBy({
@@ -91,6 +106,8 @@ export class TopicService {
       author: { id: t.user.id, pseudo: t.user.username },
       score: scoreMap2.get(t.id) ?? 0,
       commentCount: commentMap.get(t.id) ?? 0,
+      status: t.status,
+      isClosed: t.isClosed,
       createdAt: t.createdAt,
       updatedAt: t.updatedAt,
     }));
@@ -98,11 +115,12 @@ export class TopicService {
     return { data, total, page, limit: take };
   }
 
-  async findOne(id: number, requestingUserId?: number) {
-    const topic = await this.prisma.topic.findFirst({
-      where: { id, deletedAt: null },
-      select: TOPIC_SELECT,
-    });
+  async findOne(id: number, requestingUserId?: number, isAdmin = false) {
+    const where = isAdmin
+      ? { id, deletedAt: null }
+      : { id, deletedAt: null, status: 'visible' };
+
+    const topic = await this.prisma.topic.findFirst({ where, select: TOPIC_SELECT });
     if (!topic) throw new NotFoundException('Topic introuvable');
 
     const [scoreResult, userVoteResult] = await Promise.all([
@@ -132,6 +150,8 @@ export class TopicService {
       score: scoreResult._sum.value ?? 0,
       userVote: userVoteResult?.value ?? null,
       isEdited: topic.updatedAt.getTime() - topic.createdAt.getTime() > 1000,
+      status: topic.status,
+      isClosed: topic.isClosed,
       createdAt: topic.createdAt,
       updatedAt: topic.updatedAt,
     };
@@ -174,12 +194,7 @@ export class TopicService {
     };
   }
 
-  async update(
-    id: number,
-    userId: number,
-    userRole: Role,
-    dto: UpdateTopicDto,
-  ) {
+  async update(id: number, userId: number, userRole: Role, dto: UpdateTopicDto) {
     const topic = await this.prisma.topic.findFirst({
       where: { id, deletedAt: null },
     });
@@ -208,5 +223,76 @@ export class TopicService {
       ...updated,
       author: { id: updated.user.id, pseudo: updated.user.username },
     };
+  }
+
+  async hideTopic(id: number, reason?: string) {
+    const topic = await this.prisma.topic.findFirst({ where: { id, deletedAt: null } });
+    if (!topic) throw new NotFoundException('Topic introuvable');
+
+    await this.prisma.topic.update({ where: { id }, data: { status: 'hidden' } });
+
+    const message = reason
+      ? `Votre contenu a été masqué par un admin. Raison : ${reason}`
+      : 'Votre contenu a été masqué par un admin';
+    await this.notificationService.create(topic.userId, message, reason);
+
+    return { success: true };
+  }
+
+  async showTopic(id: number) {
+    const topic = await this.prisma.topic.findFirst({ where: { id, deletedAt: null } });
+    if (!topic) throw new NotFoundException('Topic introuvable');
+
+    await this.prisma.topic.update({ where: { id }, data: { status: 'visible' } });
+    return { success: true };
+  }
+
+  async deleteTopic(id: number, reason?: string) {
+    const topic = await this.prisma.topic.findFirst({
+      where: { id, deletedAt: null },
+      include: { comments: { where: { deletedAt: null }, select: { userId: true } } },
+    });
+    if (!topic) throw new NotFoundException('Topic introuvable');
+
+    const message = reason
+      ? `Votre contenu a été supprimé par un admin. Raison : ${reason}`
+      : 'Votre contenu a été supprimé par un admin';
+
+    const affectedUserIds = new Set<number>([topic.userId]);
+    topic.comments.forEach((c) => affectedUserIds.add(c.userId));
+
+    await this.prisma.topic.delete({ where: { id } });
+
+    await Promise.all(
+      Array.from(affectedUserIds).map((uid) =>
+        this.notificationService.create(uid, message, reason),
+      ),
+    );
+
+    return { success: true };
+  }
+
+  async closeTopic(id: number, userId: number, userRole: Role) {
+    const topic = await this.prisma.topic.findFirst({ where: { id, deletedAt: null } });
+    if (!topic) throw new NotFoundException('Topic introuvable');
+
+    if (topic.userId !== userId && userRole !== Role.ADMIN) {
+      throw new ForbiddenException('Accès refusé');
+    }
+
+    await this.prisma.topic.update({ where: { id }, data: { isClosed: true } });
+    return { success: true };
+  }
+
+  async reopenTopic(id: number, userId: number, userRole: Role) {
+    const topic = await this.prisma.topic.findFirst({ where: { id, deletedAt: null } });
+    if (!topic) throw new NotFoundException('Topic introuvable');
+
+    if (topic.userId !== userId && userRole !== Role.ADMIN) {
+      throw new ForbiddenException('Accès refusé');
+    }
+
+    await this.prisma.topic.update({ where: { id }, data: { isClosed: false } });
+    return { success: true };
   }
 }

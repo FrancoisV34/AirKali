@@ -13,6 +13,7 @@ import { CategoryModule } from './category/category.module';
 import { TopicModule } from './topic/topic.module';
 import { CommentModule } from './comment/comment.module';
 import { VoteModule } from './vote/vote.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { VoteModule } from './vote/vote.module';
     TopicModule,
     CommentModule,
     VoteModule,
+    NotificationModule,
   ],
 })
 export class AppModule {}

@@ -6,6 +6,8 @@ import { BreakpointObserver } from '@angular/cdk/layout';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 import { ForumService } from '../../../core/services/forum.service';
 import { CommentService } from '../../../core/services/comment.service';
@@ -24,6 +26,8 @@ import { SafeMarkdownPipe } from '../../../shared/pipes/safe-markdown.pipe';
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    MatSelectModule,
+    MatFormFieldModule,
     SafeMarkdownPipe,
   ],
   templateUrl: './forum-detail.component.html',
@@ -48,6 +52,13 @@ export class ForumDetailComponent implements OnInit {
   editingCommentContent = '';
 
   isTablet = false;
+
+  // Moderation state
+  confirmDeleteTarget: { type: 'topic' | 'comment'; id: number; topicId?: number } | null = null;
+  confirmDeleteReason = '';
+  adminTopicReason = '';
+  adminCommentReasonMap = new Map<number, string>();
+  readonly reasonOptions = ['spam', 'contenu inapproprié', 'hors sujet'];
 
   constructor(
     private route: ActivatedRoute,
@@ -199,6 +210,123 @@ export class ForumDetailComponent implements OnInit {
     this.editingCommentId = null;
   }
 
+  // --- Moderation: Topic ---
+
+  adminHideTopic(): void {
+    if (!this.topic) return;
+    this.forumService.hideTopic(this.topic.id, { reason: this.adminTopicReason || undefined }).subscribe({
+      next: () => {
+        this.topic = { ...this.topic!, status: 'hidden' };
+        this.adminTopicReason = '';
+      },
+    });
+  }
+
+  adminShowTopic(): void {
+    if (!this.topic) return;
+    this.forumService.showTopic(this.topic.id).subscribe({
+      next: () => {
+        this.topic = { ...this.topic!, status: 'visible' };
+      },
+    });
+  }
+
+  openDeleteTopicConfirm(): void {
+    if (!this.topic) return;
+    this.confirmDeleteTarget = { type: 'topic', id: this.topic.id };
+    this.confirmDeleteReason = '';
+  }
+
+  confirmDelete(): void {
+    if (!this.confirmDeleteTarget) return;
+    const { type, id, topicId } = this.confirmDeleteTarget;
+
+    if (type === 'topic') {
+      this.forumService.deleteTopic(id, { reason: this.confirmDeleteReason || undefined }).subscribe({
+        next: () => {
+          this.confirmDeleteTarget = null;
+          this.router.navigate(['/forum']);
+        },
+      });
+    } else {
+      this.commentService.deleteComment(topicId!, id, { reason: this.confirmDeleteReason || undefined }).subscribe({
+        next: () => {
+          this.confirmDeleteTarget = null;
+          this.loadComments();
+        },
+      });
+    }
+  }
+
+  cancelDelete(): void {
+    this.confirmDeleteTarget = null;
+  }
+
+  closeTopic(): void {
+    if (!this.topic) return;
+    this.forumService.closeTopic(this.topic.id).subscribe({
+      next: () => {
+        this.topic = { ...this.topic!, isClosed: true };
+      },
+    });
+  }
+
+  reopenTopic(): void {
+    if (!this.topic) return;
+    this.forumService.reopenTopic(this.topic.id).subscribe({
+      next: () => {
+        this.topic = { ...this.topic!, isClosed: false };
+      },
+    });
+  }
+
+  // --- Moderation: Comment ---
+
+  getCommentReason(commentId: number): string {
+    return this.adminCommentReasonMap.get(commentId) ?? '';
+  }
+
+  setCommentReason(commentId: number, reason: string): void {
+    this.adminCommentReasonMap.set(commentId, reason);
+  }
+
+  adminHideComment(comment: CommentNode): void {
+    if (!this.topic) return;
+    const reason = this.adminCommentReasonMap.get(comment.id);
+    this.commentService.hideComment(this.topic.id, comment.id, { reason: reason || undefined }).subscribe({
+      next: () => {
+        comment.status = 'hidden';
+        this.adminCommentReasonMap.delete(comment.id);
+      },
+    });
+  }
+
+  adminShowComment(comment: CommentNode): void {
+    if (!this.topic) return;
+    this.commentService.showComment(this.topic.id, comment.id).subscribe({
+      next: () => {
+        comment.status = 'visible';
+      },
+    });
+  }
+
+  openDeleteCommentConfirm(comment: CommentNode): void {
+    if (!this.topic) return;
+    this.confirmDeleteTarget = { type: 'comment', id: comment.id, topicId: this.topic.id };
+    this.confirmDeleteReason = '';
+  }
+
+  selfDeleteComment(comment: CommentNode): void {
+    if (!this.topic) return;
+    this.commentService.selfDeleteComment(this.topic.id, comment.id).subscribe({
+      next: () => {
+        comment.status = 'hidden';
+      },
+    });
+  }
+
+  // --- Helpers ---
+
   canVote(): boolean {
     return this.isLoggedIn && !this.isSuspended;
   }
@@ -224,7 +352,7 @@ export class ForumDetailComponent implements OnInit {
   }
 
   canPostComment(): boolean {
-    return this.isLoggedIn && !this.isSuspended;
+    return this.isLoggedIn && !this.isSuspended && !(this.topic?.isClosed ?? false);
   }
 
   prevPage(): void {

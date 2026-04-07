@@ -103,4 +103,8 @@ export class ForumListComponent implements OnInit {
   canCreateTopic(): boolean {
     return this.isLoggedIn && !this.isSuspended;
   }
+
+  isAdmin(): boolean {
+    return this.authService.getUserRole() === 'ADMIN';
+  }
 }

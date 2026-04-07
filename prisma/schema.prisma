@@ -23,21 +23,22 @@ enum CollecteStatut {
 }
 
 model User {
-  id             Int       @id @default(autoincrement())
-  email          String    @unique
-  username       String    @unique
+  id             Int            @id @default(autoincrement())
+  email          String         @unique
+  username       String         @unique
   nom            String
   prenom         String
   password       String
-  role           Role      @default(UTILISATEUR)
+  role           Role           @default(UTILISATEUR)
   adressePostale String?
-  estSuspendu    Boolean   @default(false)
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  estSuspendu    Boolean        @default(false)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
   favoris        Favori[]
   topics         Topic[]
   comments       Comment[]
   votes          Vote[]
+  notifications  Notification[]
 }
 
 model Commune {
@@ -123,6 +124,8 @@ model Topic {
   content    String    @db.Text
   userId     Int
   categoryId Int?
+  status     String    @default("visible")
+  isClosed   Boolean   @default(false)
   deletedAt  DateTime?
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
@@ -138,6 +141,7 @@ model Comment {
   userId    Int
   topicId   Int
   parentId  Int?
+  status    String    @default("visible")
   deletedAt DateTime?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -146,6 +150,17 @@ model Comment {
   topic    Topic     @relation(fields: [topicId], references: [id], onDelete: Cascade)
   parent   Comment?  @relation("CommentTree", fields: [parentId], references: [id], onDelete: Cascade)
   children Comment[] @relation("CommentTree")
+}
+
+model Notification {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  message   String    @db.Text
+  reason    String?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Vote {

@@ -39,12 +39,15 @@
     <a
       *ngFor="let topic of topics"
       class="topic-card"
+      [class.topic-hidden]="isAdmin() && topic.status === 'hidden'"
       [routerLink]="['/forum', topic.id]"
     >
       <div class="topic-main">
         <div class="topic-title-row">
           <span class="topic-title">{{ topic.title }}</span>
           <span class="category-badge" *ngIf="topic.category">{{ topic.category.name }}</span>
+          <span class="closed-badge" *ngIf="topic.isClosed">Fermé</span>
+          <span class="hidden-badge" *ngIf="isAdmin() && topic.status === 'hidden'">Masqué</span>
         </div>
         <p class="topic-excerpt">{{ topic.excerpt }}</p>
         <div class="topic-meta">

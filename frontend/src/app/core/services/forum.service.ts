@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 import { ApiService } from './api.service';
 import {
   CreateTopicBody,
+  ModerateBody,
   TopicDetail,
   TopicListResponse,
   UpdateTopicBody,
@@ -32,5 +33,25 @@ export class ForumService {
 
   updateTopic(id: number, body: UpdateTopicBody): Observable<TopicDetail> {
     return this.api.patch<TopicDetail>(`/topics/${id}`, body);
+  }
+
+  hideTopic(id: number, body: ModerateBody = {}): Observable<{ success: boolean }> {
+    return this.api.patch<{ success: boolean }>(`/topics/${id}/hide`, body);
+  }
+
+  showTopic(id: number): Observable<{ success: boolean }> {
+    return this.api.patch<{ success: boolean }>(`/topics/${id}/show`, {});
+  }
+
+  deleteTopic(id: number, body: ModerateBody = {}): Observable<{ success: boolean }> {
+    return this.api.delete<{ success: boolean }>(`/topics/${id}`, body);
+  }
+
+  closeTopic(id: number): Observable<{ success: boolean }> {
+    return this.api.patch<{ success: boolean }>(`/topics/${id}/close`, {});
+  }
+
+  reopenTopic(id: number): Observable<{ success: boolean }> {
+    return this.api.patch<{ success: boolean }>(`/topics/${id}/reopen`, {});
   }
 }

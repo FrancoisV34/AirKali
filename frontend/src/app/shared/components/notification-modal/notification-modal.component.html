@@ -1,0 +1,9 @@
+<div class="notif-overlay" *ngIf="current">
+  <div class="notif-modal">
+    <h2 class="notif-title">Un message vous a été adressé</h2>
+    <p class="notif-message">{{ current.message }}</p>
+    <div class="notif-actions">
+      <button mat-raised-button color="primary" (click)="onOk()">OK</button>
+    </div>
+  </div>
+</div>

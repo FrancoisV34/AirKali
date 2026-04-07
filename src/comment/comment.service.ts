@@ -5,6 +5,7 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { NotificationService } from '../notification/notification.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { Role } from '../common/enums/role.enum';
@@ -15,6 +16,7 @@ const COMMENT_SELECT = {
   userId: true,
   topicId: true,
   parentId: true,
+  status: true,
   createdAt: true,
   updatedAt: true,
   deletedAt: true,
@@ -23,27 +25,32 @@ const COMMENT_SELECT = {
 
 @Injectable()
 export class CommentService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notificationService: NotificationService,
+  ) {}
 
-  async findAll(topicId: number, page: number, limit: number, requestingUserId?: number) {
+  async findAll(topicId: number, page: number, limit: number, requestingUserId?: number, isAdmin = false) {
     const take = Math.min(limit, 20);
     const skip = (page - 1) * take;
 
     const topic = await this.prisma.topic.findFirst({ where: { id: topicId, deletedAt: null } });
     if (!topic) throw new NotFoundException('Topic introuvable');
 
+    const visibilityFilter = isAdmin ? {} : { status: 'visible' };
+
     const [rootComments, total] = await Promise.all([
       this.prisma.comment.findMany({
-        where: { topicId, parentId: null, deletedAt: null },
+        where: { topicId, parentId: null, deletedAt: null, ...visibilityFilter },
         select: COMMENT_SELECT,
         skip,
         take,
       }),
-      this.prisma.comment.count({ where: { topicId, parentId: null, deletedAt: null } }),
+      this.prisma.comment.count({ where: { topicId, parentId: null, deletedAt: null, ...visibilityFilter } }),
     ]);
 
     const allComments = await this.prisma.comment.findMany({
-      where: { topicId, parentId: { not: null }, deletedAt: null },
+      where: { topicId, parentId: { not: null }, deletedAt: null, ...visibilityFilter },
       select: COMMENT_SELECT,
     });
 
@@ -78,6 +85,7 @@ export class CommentService {
       userVote: userVoteMap.get(c.id) ?? null,
       isEdited: c.updatedAt.getTime() - c.createdAt.getTime() > 1000,
       parentId: c.parentId,
+      status: c.status,
       createdAt: c.createdAt,
       updatedAt: c.updatedAt,
     });
@@ -115,6 +123,10 @@ export class CommentService {
 
     const topic = await this.prisma.topic.findFirst({ where: { id: topicId, deletedAt: null } });
     if (!topic) throw new NotFoundException('Topic introuvable');
+
+    if (topic.isClosed) {
+      throw new ForbiddenException('Ce topic est fermé');
+    }
 
     if (dto.parentId) {
       const parent = await this.prisma.comment.findFirst({
@@ -164,6 +176,62 @@ export class CommentService {
       ...updated,
       author: { id: updated.user.id, pseudo: updated.user.username },
     };
+  }
+
+  async hideComment(topicId: number, commentId: number, reason?: string) {
+    const comment = await this.prisma.comment.findFirst({
+      where: { id: commentId, topicId, deletedAt: null },
+    });
+    if (!comment) throw new NotFoundException('Commentaire introuvable');
+
+    await this.prisma.comment.update({ where: { id: commentId }, data: { status: 'hidden' } });
+
+    const message = reason
+      ? `Votre contenu a été masqué par un admin. Raison : ${reason}`
+      : 'Votre contenu a été masqué par un admin';
+    await this.notificationService.create(comment.userId, message, reason);
+
+    return { success: true };
+  }
+
+  async showComment(topicId: number, commentId: number) {
+    const comment = await this.prisma.comment.findFirst({
+      where: { id: commentId, topicId, deletedAt: null },
+    });
+    if (!comment) throw new NotFoundException('Commentaire introuvable');
+
+    await this.prisma.comment.update({ where: { id: commentId }, data: { status: 'visible' } });
+    return { success: true };
+  }
+
+  async deleteComment(topicId: number, commentId: number, reason?: string) {
+    const comment = await this.prisma.comment.findFirst({
+      where: { id: commentId, topicId, deletedAt: null },
+    });
+    if (!comment) throw new NotFoundException('Commentaire introuvable');
+
+    const message = reason
+      ? `Votre contenu a été supprimé par un admin. Raison : ${reason}`
+      : 'Votre contenu a été supprimé par un admin';
+
+    await this.prisma.comment.delete({ where: { id: commentId } });
+    await this.notificationService.create(comment.userId, message, reason);
+
+    return { success: true };
+  }
+
+  async selfDeleteComment(topicId: number, commentId: number, userId: number) {
+    const comment = await this.prisma.comment.findFirst({
+      where: { id: commentId, topicId, deletedAt: null },
+    });
+    if (!comment) throw new NotFoundException('Commentaire introuvable');
+
+    if (comment.userId !== userId) {
+      throw new ForbiddenException('Accès refusé');
+    }
+
+    await this.prisma.comment.update({ where: { id: commentId }, data: { status: 'hidden' } });
+    return { success: true };
   }
 
   private async computeDepth(commentId: number): Promise<number> {

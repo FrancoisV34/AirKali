@@ -17,6 +17,8 @@ export interface TopicSummary {
   author: TopicAuthor;
   score: number;
   commentCount: number;
+  status: string;
+  isClosed: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -30,6 +32,8 @@ export interface TopicDetail {
   score: number;
   userVote: 1 | -1 | null;
   isEdited: boolean;
+  status: string;
+  isClosed: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -49,6 +53,7 @@ export interface CommentNode {
   userVote: 1 | -1 | null;
   isEdited: boolean;
   parentId: number | null;
+  status: string;
   createdAt: string;
   updatedAt: string;
   children: CommentNode[];
@@ -81,4 +86,17 @@ export interface UpdateTopicBody {
 export interface CreateCommentBody {
   content: string;
   parentId?: number | null;
+}
+
+export interface ModerateBody {
+  reason?: string;
+}
+
+export interface Notification {
+  id: number;
+  userId: number;
+  message: string;
+  reason: string | null;
+  readAt: string | null;
+  createdAt: string;
 }

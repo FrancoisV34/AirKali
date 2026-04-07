@@ -3,3 +3,8 @@
   <router-outlet />
 </main>
 <app-footer />
+
+<app-notification-modal
+  [notifications]="pendingNotifications"
+  (acknowledged)="onNotificationAcknowledged($event)"
+/>

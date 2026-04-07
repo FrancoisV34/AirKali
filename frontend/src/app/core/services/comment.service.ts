@@ -5,6 +5,7 @@ import {
   CommentListResponse,
   CommentNode,
   CreateCommentBody,
+  ModerateBody,
 } from '../models/forum.models';
 
 @Injectable({ providedIn: 'root' })
@@ -32,6 +33,33 @@ export class CommentService {
     return this.api.patch<CommentNode>(
       `/topics/${topicId}/comments/${commentId}`,
       { content },
+    );
+  }
+
+  hideComment(topicId: number, commentId: number, body: ModerateBody = {}): Observable<{ success: boolean }> {
+    return this.api.patch<{ success: boolean }>(
+      `/topics/${topicId}/comments/${commentId}/hide`,
+      body,
+    );
+  }
+
+  showComment(topicId: number, commentId: number): Observable<{ success: boolean }> {
+    return this.api.patch<{ success: boolean }>(
+      `/topics/${topicId}/comments/${commentId}/show`,
+      {},
+    );
+  }
+
+  deleteComment(topicId: number, commentId: number, body: ModerateBody = {}): Observable<{ success: boolean }> {
+    return this.api.delete<{ success: boolean }>(
+      `/topics/${topicId}/comments/${commentId}`,
+      body,
+    );
+  }
+
+  selfDeleteComment(topicId: number, commentId: number): Observable<{ success: boolean }> {
+    return this.api.delete<{ success: boolean }>(
+      `/topics/${topicId}/comments/${commentId}/self`,
     );
   }
 }
