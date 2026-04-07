@@ -59,7 +59,7 @@
 
     <div class="new-comment" *ngIf="canPostComment()">
       <div class="reply-indicator" *ngIf="replyingTo">
-        <span>En réponse à <strong>@{{ replyingTo.pseudo }}</strong></span>
+        <span>En réponse à <strong>&#64;{{ replyingTo.pseudo }}</strong></span>
         <button mat-icon-button (click)="cancelReply()" title="Annuler la réponse">
           <mat-icon>close</mat-icon>
         </button>
