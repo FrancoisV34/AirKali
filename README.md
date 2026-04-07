@@ -21,7 +21,10 @@ npx prisma migrate deploy
 # 4. Charger les ~35 000 communes francaises
 npx prisma db seed
 
-# 5. L'API est disponible sur http://localhost:3000
+# 5. (Optionnel) Charger des donnees de demo pour le forum
+npx ts-node prisma/seed-forum.ts
+
+# 6. L'API est disponible sur http://localhost:3000
 ```
 
 ## Demarrage sans Docker
@@ -31,6 +34,7 @@ npm install
 npx prisma generate
 npx prisma migrate deploy
 npx prisma db seed
+npx ts-node prisma/seed-forum.ts  # optionnel, donnees de demo forum
 npm run start:dev
 ```
 
