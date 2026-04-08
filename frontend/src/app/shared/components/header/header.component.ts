@@ -26,4 +26,8 @@ export class HeaderComponent {
   onLogout(): void {
     this.authService.logout();
   }
+
+  get isAdmin(): boolean {
+    return this.authService.getUserRole() === 'ADMIN';
+  }
 }

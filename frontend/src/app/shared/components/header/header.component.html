@@ -22,6 +22,10 @@
         <mat-icon>person</mat-icon>
         <span class="nav-label">Mon profil</span>
       </a>
+      <a mat-button routerLink="/admin/utilisateurs" routerLinkActive="active" *ngIf="isAdmin">
+        <mat-icon>admin_panel_settings</mat-icon>
+        <span class="nav-label">Admin</span>
+      </a>
       <button mat-button (click)="onLogout()">
         <mat-icon>logout</mat-icon>
         <span class="nav-label">Déconnexion</span>

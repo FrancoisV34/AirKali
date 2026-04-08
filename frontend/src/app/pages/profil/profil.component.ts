@@ -23,6 +23,7 @@ import { Favorite, FavoriteService } from '../../core/services/favorite.service'
 import { Commune, CommuneService } from '../../core/services/commune.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
+import { SuspensionHistoryComponent } from '../admin/suspension-history/suspension-history.component';
 
 @Component({
   selector: 'app-profil',
@@ -38,6 +39,7 @@ import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/c
     MatCardModule,
     MatDialogModule,
     MatListModule,
+    SuspensionHistoryComponent,
   ],
   templateUrl: './profil.component.html',
   styleUrl: './profil.component.scss',

@@ -141,6 +141,12 @@
   </p>
 </div>
 
+<!-- Historique de suspension -->
+<div class="profil-container" *ngIf="!loading && profile">
+  <h2>Historique de suspension</h2>
+  <app-suspension-history [userId]="profile.id" [isAdminView]="false"></app-suspension-history>
+</div>
+
 <div class="profil-container loading" *ngIf="loading">
   <p>Chargement du profil...</p>
 </div>

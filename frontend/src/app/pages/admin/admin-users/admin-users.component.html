@@ -1,0 +1,82 @@
+<div class="admin-container">
+  <h2>Gestion des utilisateurs</h2>
+
+  <div class="action-message" *ngIf="actionMessage">{{ actionMessage }}</div>
+
+  <div class="search-bar">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Rechercher par nom</mat-label>
+      <input matInput [(ngModel)]="searchInput" (keyup.enter)="onSearch()" placeholder="Nom ou prénom..." />
+    </mat-form-field>
+    <button mat-raised-button color="primary" (click)="onSearch()">
+      <mat-icon>search</mat-icon> Rechercher
+    </button>
+    <button mat-stroked-button (click)="onClearSearch()" *ngIf="searchInput">
+      <mat-icon>clear</mat-icon>
+    </button>
+  </div>
+
+  <div class="loading-spinner" *ngIf="loading">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <div class="users-list" *ngIf="!loading">
+    <div class="user-count">{{ total }} utilisateur(s)</div>
+
+    <mat-card *ngFor="let user of users" class="user-card">
+      <mat-card-content>
+        <div class="user-row">
+          <div class="user-info">
+            <strong>{{ user.prenom }} {{ user.nom }}</strong>
+            <span class="user-email">{{ user.email }}</span>
+            <span class="badge" [class.badge-admin]="user.role === 'ADMIN'" [class.badge-user]="user.role !== 'ADMIN'">
+              {{ user.role }}
+            </span>
+            <span class="badge" [class.badge-suspended]="user.estSuspendu" [class.badge-active]="!user.estSuspendu">
+              {{ user.estSuspendu ? 'SUSPENDU' : 'ACTIF' }}
+            </span>
+          </div>
+
+          <div class="user-actions">
+            <button
+              mat-stroked-button
+              color="warn"
+              *ngIf="canSuspend(user)"
+              (click)="onSuspend(user)"
+            >
+              <mat-icon>block</mat-icon> Suspendre
+            </button>
+            <button
+              mat-stroked-button
+              color="primary"
+              *ngIf="canReactivate(user)"
+              (click)="onReactivate(user)"
+            >
+              <mat-icon>check_circle</mat-icon> Réactiver
+            </button>
+            <button mat-stroked-button (click)="onToggleHistory(user.id)">
+              <mat-icon>history</mat-icon>
+              {{ expandedHistoryUserId === user.id ? 'Masquer' : 'Historique' }}
+            </button>
+          </div>
+        </div>
+
+        <div *ngIf="expandedHistoryUserId === user.id" class="history-panel">
+          <app-suspension-history [userId]="user.id" [isAdminView]="true"></app-suspension-history>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <p *ngIf="users.length === 0" class="no-users">Aucun utilisateur trouvé.</p>
+  </div>
+
+  <div class="pagination" *ngIf="totalPages > 1">
+    <button mat-stroked-button [disabled]="page === 1" (click)="onPrevPage()">
+      <mat-icon>chevron_left</mat-icon>
+    </button>
+    <span>Page {{ page }} / {{ totalPages }}</span>
+    <button mat-stroked-button [disabled]="page === totalPages" (click)="onNextPage()">
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+  </div>
+</div>

@@ -164,6 +164,22 @@ export class UserService {
     throw new BadRequestException('communeId est requis');
   }
 
+  async getSuspensionHistory(userId: number) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new NotFoundException('User not found');
+
+    return this.prisma.suspensionLog.findMany({
+      where: { userId },
+      select: {
+        id: true,
+        action: true,
+        motif: true,
+        createdAt: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
   private async _activateCommune(commune: { id: number; latitude: unknown; longitude: unknown }) {
     const lat = Number(commune.latitude);
     const lng = Number(commune.longitude);

@@ -14,12 +14,15 @@ import { TopicModule } from './topic/topic.module';
 import { CommentModule } from './comment/comment.module';
 import { VoteModule } from './vote/vote.module';
 import { NotificationModule } from './notification/notification.module';
+import { MailModule } from './mail/mail.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     ScheduleModule.forRoot(),
     PrismaModule,
+    MailModule,
     AuthModule,
     UserModule,
     CommuneModule,
@@ -32,6 +35,7 @@ import { NotificationModule } from './notification/notification.module';
     CommentModule,
     VoteModule,
     NotificationModule,
+    AdminModule,
   ],
 })
 export class AppModule {}
