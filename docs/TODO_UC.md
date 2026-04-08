@@ -25,10 +25,10 @@ Référence : Dossier des spécifications générales BfA (20/03/2026)
 | UC9 | Créer un topic (forum, titre max 255 car., contenu obligatoire) | DONE | SPEC_006 |
 | UC10 | Poster un commentaire (réponse à topic actif) | DONE | SPEC_006 |
 | UC11 | Voter sur le forum (+/- toggle, pas d'auto-vote) | DONE | SPEC_006 |
-| UC13 | Modérer le forum (soft delete messages) | TODO | — |
-| UC14 | Supprimer des messages (admin) | TODO | — |
+| UC13 | Modérer le forum (soft delete messages) | DONE | SPEC_007 |
+| UC14 | Supprimer des messages (admin) | DONE | SPEC_007 |
 | UC15 | Suspendre un utilisateur (mécanisme backend) | DONE | SPEC_001 |
-| UC15 | Suspendre un utilisateur (interface admin) | TODO | — |
+| UC15 | Suspendre un utilisateur (interface admin) | DONE | SPEC_008 |
 | UC16 | Émettre alertes/notifications email (admin, niveaux INFO/WARNING/CRITICAL) | TODO | — |
 
 ## P3 — Priorité basse
@@ -36,11 +36,11 @@ Référence : Dossier des spécifications générales BfA (20/03/2026)
 | UC | Titre | Statut | Spec |
 |----|-------|--------|------|
 | UC4 | Exporter PDF/CSV (données historiques commune + période) | TODO | — |
-| UC12 | Gérer sa localisation (adresse postale → commune/département/région) | TODO | — |
+| UC12 | Gérer sa localisation (adresse postale → commune/département/région) | DONE | SPEC_008 |
 | UC_DISCO | Se déconnecter | DONE | SPEC_004 |
 
 ## Résumé
 
-- **DONE** : 17 UC
-- **TODO** : 6 UC
-- **Specs rédigées** : SPEC_001, SPEC_002, SPEC_003, SPEC_004, SPEC_005, SPEC_006
+- **DONE** : 21 UC
+- **TODO** : 2 UC (UC16 alertes/notifications email admin, UC4 export PDF/CSV)
+- **Specs rédigées** : SPEC_001 à SPEC_008
