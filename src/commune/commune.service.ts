@@ -87,6 +87,23 @@ export class CommuneService {
     };
   }
 
+  async findByCodePostal(codePostal: string) {
+    if (!/^\d{5}$/.test(codePostal)) {
+      throw new BadRequestException('Le code postal doit contenir exactement 5 chiffres');
+    }
+
+    return this.prisma.commune.findMany({
+      where: { codePostal, active: true },
+      select: {
+        id: true,
+        nom: true,
+        codePostal: true,
+        codeInsee: true,
+      },
+      orderBy: { nom: 'asc' },
+    });
+  }
+
   async findById(id: number) {
     const commune = await this.prisma.commune.findUnique({
       where: { id },

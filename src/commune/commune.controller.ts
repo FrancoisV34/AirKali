@@ -17,6 +17,11 @@ export class CommuneController {
     return this.communeService.search(search);
   }
 
+  @Get('par-code-postal')
+  findByCodePostal(@Query('codePostal') codePostal: string) {
+    return this.communeService.findByCodePostal(codePostal);
+  }
+
   @Get('active')
   getActive(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,

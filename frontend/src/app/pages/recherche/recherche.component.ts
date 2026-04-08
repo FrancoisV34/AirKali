@@ -48,6 +48,7 @@ export class RechercheComponent implements OnInit {
       this.isLoggedIn = loggedIn;
       if (loggedIn) {
         this.favoriteService.loadFavorites();
+        this._centerOnUserCommune();
       }
     });
 
@@ -56,6 +57,26 @@ export class RechercheComponent implements OnInit {
         setTimeout(() => {
           this.mapComponent?.loadMarkers(result.data);
         }, 100);
+      },
+    });
+  }
+
+  private _centerOnUserCommune(): void {
+    this.authService.getCurrentUser().subscribe({
+      next: (profile) => {
+        if (profile.communeId) {
+          this.communeService.getCommuneById(profile.communeId).subscribe({
+            next: (commune) => {
+              setTimeout(() => {
+                this.mapComponent?.centerOn(
+                  Number(commune.latitude),
+                  Number(commune.longitude),
+                  12,
+                );
+              }, 150);
+            },
+          });
+        }
       },
     });
   }

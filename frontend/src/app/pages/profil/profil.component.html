@@ -45,11 +45,6 @@
       </mat-error>
     </mat-form-field>
 
-    <mat-form-field appearance="outline">
-      <mat-label>Adresse postale</mat-label>
-      <input matInput formControlName="adressePostale" />
-    </mat-form-field>
-
     <div class="readonly-fields">
       <div class="readonly-field">
         <span class="field-label">Rôle</span>
@@ -67,6 +62,63 @@
   </form>
 </div>
 
+<!-- Commune de référence -->
+<div class="profil-container" *ngIf="!loading && profile">
+  <h2>Ma commune de référence</h2>
+
+  <div class="commune-current" *ngIf="profile.commune">
+    <span class="commune-name">
+      <mat-icon>location_on</mat-icon>
+      {{ profile.commune.nom }} ({{ profile.commune.codePostal }})
+    </span>
+    <button mat-stroked-button color="warn" (click)="onRemoveCommune()" class="remove-commune-btn">
+      <mat-icon>remove_circle_outline</mat-icon>
+      Retirer ma commune
+    </button>
+  </div>
+
+  <p *ngIf="!profile.commune" class="no-commune">
+    Aucune commune de référence définie.
+  </p>
+
+  <div class="commune-search">
+    <mat-form-field appearance="outline" class="cp-field">
+      <mat-label>Code postal</mat-label>
+      <input matInput [(ngModel)]="communeSearchInput" placeholder="ex: 69001" maxlength="5" />
+    </mat-form-field>
+    <button mat-raised-button color="accent" (click)="onCommuneSearch()" [disabled]="communeSearchLoading">
+      Rechercher
+    </button>
+  </div>
+
+  <div class="commune-error" *ngIf="communeSearchError">{{ communeSearchError }}</div>
+
+  <div class="commune-results" *ngIf="communeResults.length > 0">
+    <p class="results-label">Sélectionnez votre commune :</p>
+    <mat-card
+      *ngFor="let c of communeResults"
+      class="commune-result-card"
+      [class.selected]="selectedCommuneResult?.id === c.id"
+      (click)="onSelectCommuneResult(c)"
+    >
+      <mat-card-content>{{ c.nom }}</mat-card-content>
+    </mat-card>
+
+    <button
+      mat-raised-button
+      color="primary"
+      [disabled]="!selectedCommuneResult"
+      (click)="onSaveCommune()"
+      class="save-commune-btn"
+    >
+      Enregistrer
+    </button>
+  </div>
+
+  <div class="commune-save-message" *ngIf="communeSaveMessage">{{ communeSaveMessage }}</div>
+</div>
+
+<!-- Mes favoris -->
 <div class="profil-container" *ngIf="!loading">
   <h2>Mes favoris</h2>
 

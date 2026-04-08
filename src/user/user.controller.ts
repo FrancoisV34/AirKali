@@ -2,6 +2,7 @@ import { Body, Controller, Get, Patch, Request, UseGuards } from '@nestjs/common
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { UserService } from './user.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { UpdateCommuneDto } from './dto/update-commune.dto';
 
 @Controller('user')
 export class UserController {
@@ -20,5 +21,14 @@ export class UserController {
     @Body() dto: UpdateProfileDto,
   ) {
     return this.userService.updateProfile(req.user.id, dto);
+  }
+
+  @Patch('commune')
+  @UseGuards(JwtAuthGuard)
+  updateCommune(
+    @Request() req: { user: { id: number } },
+    @Body() dto: UpdateCommuneDto,
+  ) {
+    return this.userService.updateCommune(req.user.id, dto);
   }
 }

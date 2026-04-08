@@ -17,6 +17,7 @@ describe('CommuneService', () => {
             commune: {
               findMany: jest.fn(),
               findUnique: jest.fn(),
+              count: jest.fn(),
             },
           },
         },
@@ -59,6 +60,47 @@ describe('CommuneService', () => {
     it('should throw NotFoundException if commune not found', async () => {
       (prisma.commune.findUnique as jest.Mock).mockResolvedValue(null);
       await expect(service.findById(999)).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('findByCodePostal', () => {
+    it('should return active communes for a valid postal code', async () => {
+      const mockCommunes = [
+        { id: 1, nom: 'Lyon 1er', codePostal: '69001', codeInsee: '69381' },
+      ];
+      (prisma.commune.findMany as jest.Mock).mockResolvedValue(mockCommunes);
+
+      const result = await service.findByCodePostal('69001');
+      expect(result).toEqual(mockCommunes);
+      expect(prisma.commune.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { codePostal: '69001', active: true },
+        }),
+      );
+    });
+
+    it('should return empty array when no active communes found', async () => {
+      (prisma.commune.findMany as jest.Mock).mockResolvedValue([]);
+      const result = await service.findByCodePostal('00000');
+      expect(result).toEqual([]);
+    });
+
+    it('should throw BadRequestException for a 4-digit postal code', async () => {
+      await expect(service.findByCodePostal('6900')).rejects.toThrow(
+        BadRequestException,
+      );
+    });
+
+    it('should throw BadRequestException for a 6-digit postal code', async () => {
+      await expect(service.findByCodePostal('690015')).rejects.toThrow(
+        BadRequestException,
+      );
+    });
+
+    it('should throw BadRequestException for non-numeric postal code', async () => {
+      await expect(service.findByCodePostal('ABCDE')).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 });

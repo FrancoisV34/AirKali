@@ -25,6 +25,8 @@ export interface UserProfile {
   role: string;
   estSuspendu: boolean;
   adressePostale: string | null;
+  communeId: number | null;
+  commune: { id: number; nom: string; codePostal: string } | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -122,5 +124,9 @@ export class AuthService {
 
   updateProfile(data: UpdateProfileData): Observable<UserProfile> {
     return this.api.patch<UserProfile>('/user/profile', data);
+  }
+
+  updateUserCommune(communeId: number | null, codePostal?: string): Observable<UserProfile> {
+    return this.api.patch<UserProfile>('/user/commune', { communeId, codePostal });
   }
 }

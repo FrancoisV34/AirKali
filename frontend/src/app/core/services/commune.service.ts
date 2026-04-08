@@ -42,4 +42,8 @@ export class CommuneService {
   getCommuneById(id: number): Observable<Commune> {
     return this.api.get<Commune>(`/communes/${id}`);
   }
+
+  getCommunesByCodePostal(codePostal: string): Observable<Commune[]> {
+    return this.api.get<Commune[]>(`/communes/par-code-postal?codePostal=${encodeURIComponent(codePostal)}`);
+  }
 }

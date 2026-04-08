@@ -31,6 +31,8 @@ model User {
   password       String
   role           Role           @default(UTILISATEUR)
   adressePostale String?
+  communeId      Int?
+  commune        Commune?       @relation(fields: [communeId], references: [id], onDelete: SetNull)
   estSuspendu    Boolean        @default(false)
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
@@ -39,6 +41,8 @@ model User {
   comments       Comment[]
   votes          Vote[]
   notifications  Notification[]
+  suspensions    SuspensionLog[] @relation("UserSuspensions")
+  adminActions   SuspensionLog[] @relation("AdminActions")
 }
 
 model Commune {
@@ -52,9 +56,10 @@ model Commune {
   active      Boolean   @default(false)
   activatedAt DateTime?
 
-  donneesAir   DonneeAir[]
-  donneesMeteo DonneeMeteo[]
-  favoris      Favori[]
+  donneesAir      DonneeAir[]
+  donneesMeteo    DonneeMeteo[]
+  favoris         Favori[]
+  usersReference  User[]
 
   @@index([nom])
   @@index([codePostal])
@@ -174,4 +179,16 @@ model Vote {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, targetType, targetId])
+}
+
+model SuspensionLog {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  adminId   Int
+  action    String
+  motif     String?  @db.Text
+  createdAt DateTime @default(now())
+
+  user  User @relation("UserSuspensions", fields: [userId], references: [id], onDelete: Cascade)
+  admin User @relation("AdminActions", fields: [adminId], references: [id])
 }
