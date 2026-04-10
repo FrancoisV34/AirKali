@@ -92,6 +92,20 @@ npm run start:dev
 | MAJ population | Minuit | geo.api.gouv.fr → BDD (communes actives) |
 | Desactivation | Minuit | Desactive les communes inactives depuis 7 jours |
 
+## Troubleshooting
+
+### 500 Internal Server Error sur `GET /api/user/profile`
+
+Si l'endpoint `/api/user/profile` retourne un 500 alors que le backend tourne normalement, c'est probablement un **token JWT expire ou corrompu** stocke dans le `localStorage` du navigateur. Le JWT guard echoue a decoder le token et NestJS retourne un 500 generique au lieu d'un 401.
+
+**Solution** : se deconnecter et se reconnecter (ou vider le `localStorage` dans les DevTools du navigateur). Un nouveau token sera genere au login.
+
+### Port 3000 deja utilise au `docker compose up`
+
+Si le container API ne demarre pas avec `bind: address already in use`, un process Node (NestJS local) tourne deja sur le port 3000. Deux options :
+- **Mode Docker** : `lsof -i :3000` pour trouver le PID, puis `kill <PID>`, et relancer `docker compose up -d`
+- **Mode local** : lancer uniquement la DB avec `docker compose up -d db` et NestJS en local avec `npm run start:dev`
+
 ## Tests
 
 ```bash

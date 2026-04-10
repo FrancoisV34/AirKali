@@ -1,8 +1,8 @@
 import { PrismaClient } from '@prisma/client';
+import { PrismaMariaDb } from '@prisma/adapter-mariadb';
 
-const prisma = new PrismaClient({
-  datasourceUrl: process.env.DATABASE_URL,
-});
+const adapter = new PrismaMariaDb(process.env.DATABASE_URL!);
+const prisma = new PrismaClient({ adapter });
 
 interface GeoApiCommune {
   code: string;
