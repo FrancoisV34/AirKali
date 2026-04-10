@@ -66,6 +66,14 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
+    path: 'profil/alertes',
+    loadComponent: () =>
+      import('./pages/profil/alertes/alertes.component').then(
+        (m) => m.AlertesComponent,
+      ),
+    canActivate: [authGuard],
+  },
+  {
     path: 'admin/utilisateurs',
     loadComponent: () =>
       import('./pages/admin/admin-users/admin-users.component').then(

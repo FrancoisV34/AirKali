@@ -1,0 +1,147 @@
+<div class="alertes-container">
+  <div class="header">
+    <h2>Mes alertes</h2>
+    <a mat-button routerLink="/profil">
+      <mat-icon>arrow_back</mat-icon> Retour au profil
+    </a>
+  </div>
+
+  <div class="error" *ngIf="error">{{ error }}</div>
+
+  <!-- Section configuration -->
+  <section class="config-section">
+    <h3>Alertes configurees ({{ alerts.length }}/3)</h3>
+
+    <div class="alerts-list" *ngIf="alerts.length > 0">
+      <mat-card *ngFor="let alert of alerts" class="alert-card">
+        <mat-card-content>
+          <div class="alert-info">
+            <div class="alert-main">
+              <mat-icon>{{ alert.type === 'AIR' ? 'air' : 'thunderstorm' }}</mat-icon>
+              <div>
+                <strong>{{ alert.commune.nom }}</strong>
+                <span class="alert-detail">
+                  {{ getTypeLabel(alert.type) }} — {{ getPalierLabel(alert.palier) }}
+                </span>
+                <span class="alert-inactive" *ngIf="!isInFavorites(alert.communeId)">
+                  (commune retiree des favoris)
+                </span>
+              </div>
+            </div>
+            <div class="alert-actions">
+              <mat-slide-toggle
+                [checked]="alert.active"
+                (change)="onToggle(alert)"
+                [disabled]="isSuspended"
+              ></mat-slide-toggle>
+              <button mat-icon-button color="warn" (click)="onDelete(alert.id)" [disabled]="isSuspended">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+          <div class="alert-meta" *ngIf="alert.lastTriggeredAt">
+            Dernier declenchement : {{ alert.lastTriggeredAt | date:'dd/MM/yyyy HH:mm' }}
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <p *ngIf="alerts.length === 0 && !loading" class="empty">
+      Aucune alerte configuree.
+    </p>
+
+    <!-- Create button -->
+    <div class="create-section" *ngIf="!showForm">
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="showForm = true"
+        [disabled]="!canCreate"
+      >
+        <mat-icon>add</mat-icon> Nouvelle alerte
+      </button>
+      <span class="limit-msg" *ngIf="alerts.length >= 3">
+        Limite de 3 alertes atteinte
+      </span>
+    </div>
+
+    <!-- Create form -->
+    <mat-card *ngIf="showForm" class="create-form">
+      <mat-card-content>
+        <h4>Nouvelle alerte</h4>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Commune (favoris)</mat-label>
+          <mat-select [(ngModel)]="selectedCommuneId">
+            <mat-option *ngFor="let fav of favorites" [value]="fav.communeId">
+              {{ fav.commune.nom }} ({{ fav.commune.codePostal }})
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Type</mat-label>
+          <mat-select [(ngModel)]="selectedType" (ngModelChange)="onTypeChange()">
+            <mat-option value="AIR">Qualite de l'air</mat-option>
+            <mat-option value="METEO">Meteo</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Seuil</mat-label>
+          <mat-select [(ngModel)]="selectedPalier">
+            <mat-option *ngFor="let p of palierOptions" [value]="p.value">
+              {{ p.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <div class="form-error" *ngIf="formError">{{ formError }}</div>
+
+        <div class="form-actions">
+          <button mat-button (click)="showForm = false">Annuler</button>
+          <button mat-raised-button color="primary" (click)="onCreate()">
+            Creer l'alerte
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </section>
+
+  <!-- Section historique -->
+  <section class="history-section">
+    <h3>Historique des alertes</h3>
+
+    <div class="history-list" *ngIf="history.length > 0">
+      <table class="history-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Commune</th>
+            <th>Type</th>
+            <th>Valeur</th>
+            <th>Seuil</th>
+            <th>Officielle</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let log of history">
+            <td>{{ log.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td>{{ log.commune.nom }}</td>
+            <td>{{ getTypeLabel(log.type) }}</td>
+            <td>{{ log.valeurMesuree }} {{ log.unite }}</td>
+            <td>{{ log.seuilDeclenche }} {{ log.unite }}</td>
+            <td>
+              <mat-chip *ngIf="log.officielle" color="warn" selected>Oui</mat-chip>
+              <span *ngIf="!log.officielle">Non</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p *ngIf="history.length === 0 && !loading" class="empty">
+      Aucun historique d'alerte.
+    </p>
+  </section>
+</div>

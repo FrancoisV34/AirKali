@@ -141,6 +141,15 @@
   </p>
 </div>
 
+<!-- Mes alertes -->
+<div class="profil-container" *ngIf="!loading">
+  <h2>Mes alertes</h2>
+  <p>Configurez des alertes email pour etre notifie quand des seuils environnementaux sont depasses sur vos communes favorites.</p>
+  <a mat-raised-button color="accent" routerLink="/profil/alertes">
+    <mat-icon>notifications</mat-icon> Gerer mes alertes
+  </a>
+</div>
+
 <!-- Historique de suspension -->
 <div class="profil-container" *ngIf="!loading && profile">
   <h2>Historique de suspension</h2>

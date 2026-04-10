@@ -5,6 +5,7 @@ import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { AirQualityApiService } from './air-quality-api.service';
 import { MeteoApiService } from './meteo-api.service';
+import { AlertService } from '../alert/alert.service';
 
 @Injectable()
 export class CollecteService {
@@ -15,6 +16,7 @@ export class CollecteService {
     private airQualityApi: AirQualityApiService,
     private meteoApi: MeteoApiService,
     private httpService: HttpService,
+    private alertService: AlertService,
   ) {}
 
   @Cron(CronExpression.EVERY_HOUR)
@@ -46,6 +48,13 @@ export class CollecteService {
             dateHeure: new Date(data.dateHeure),
           },
         });
+
+        // Check air alerts
+        try {
+          await this.alertService.checkAirAlerts(commune.id, data.indiceQualite);
+        } catch (alertErr) {
+          this.logger.error(`Erreur check alertes air commune ${commune.id}`, alertErr);
+        }
 
         communesTraitees++;
       } catch (error) {
@@ -97,10 +106,27 @@ export class CollecteService {
             pression: data.pression,
             humidite: data.humidite,
             meteoCiel: data.meteoCiel,
+            weatherCode: data.weatherCode,
             vitesseVent: data.vitesseVent,
             dateHeure: new Date(data.dateHeure),
           },
         });
+
+        // Check meteo alerts
+        try {
+          await this.alertService.checkMeteoAlerts(commune.id, {
+            temperature: data.temperature,
+            vitesseVent: data.vitesseVent,
+            weatherCode: data.weatherCode,
+          });
+          await this.alertService.checkMeteoUnderThreshold(commune.id, {
+            temperature: data.temperature,
+            vitesseVent: data.vitesseVent,
+            weatherCode: data.weatherCode,
+          });
+        } catch (alertErr) {
+          this.logger.error(`Erreur check alertes meteo commune ${commune.id}`, alertErr);
+        }
 
         communesTraitees++;
       } catch (error) {
@@ -195,5 +221,8 @@ export class CollecteService {
     if (result.count > 0) {
       this.logger.log(`${result.count} communes désactivées (inactives > 7j)`);
     }
+
+    // Purge alert logs > 30 days
+    await this.alertService.purgeOldLogs();
   }
 }

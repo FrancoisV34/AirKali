@@ -4,6 +4,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { AirQualityApiService } from './air-quality-api.service';
 import { MeteoApiService } from './meteo-api.service';
 import { HttpService } from '@nestjs/axios';
+import { AlertService } from '../alert/alert.service';
 
 describe('CollecteService', () => {
   let service: CollecteService;
@@ -37,6 +38,15 @@ describe('CollecteService', () => {
         {
           provide: HttpService,
           useValue: { get: jest.fn() },
+        },
+        {
+          provide: AlertService,
+          useValue: {
+            checkAirAlerts: jest.fn().mockResolvedValue(undefined),
+            checkMeteoAlerts: jest.fn().mockResolvedValue(undefined),
+            checkMeteoUnderThreshold: jest.fn().mockResolvedValue(undefined),
+            purgeOldLogs: jest.fn().mockResolvedValue(undefined),
+          },
         },
       ],
     }).compile();

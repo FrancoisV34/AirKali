@@ -33,6 +33,35 @@ export class MailService {
     await this._send(to, subject, text);
   }
 
+  async sendAlertEmail(to: string, data: {
+    communeName: string;
+    type: 'AIR' | 'METEO';
+    valeur: number;
+    seuil: number;
+    unite: string;
+    officielle: boolean;
+    communeId: number;
+  }): Promise<void> {
+    const typeLabel = data.type === 'AIR' ? 'qualite de l\'air' : 'meteo';
+    const officielleLabel = data.officielle ? 'officielle ' : '';
+    const subject = `[Breath for All] Alerte ${data.type === 'AIR' ? 'air' : 'meteo'} — ${data.communeName}`;
+    const text = [
+      `Alerte ${officielleLabel}${typeLabel}`,
+      '',
+      `Commune : ${data.communeName}`,
+      `Valeur mesuree : ${data.valeur} ${data.unite}`,
+      `Seuil declenche : ${data.seuil} ${data.unite}`,
+      '',
+      `Consultez les donnees detaillees sur votre espace.`,
+      '',
+      '---',
+      'Pour gerer vos alertes, rendez-vous sur votre espace personnel',
+      'dans la section "Mes alertes".',
+    ].join('\n');
+
+    await this._send(to, subject, text);
+  }
+
   async sendReactivationEmail(to: string, prenom: string): Promise<void> {
     const subject = 'Votre compte Breath for All a été réactivé';
     const text = `Bonjour ${prenom},\n\nVotre compte a été réactivé. Vous pouvez à nouveau vous connecter.\n\nL'équipe Breath for All`;

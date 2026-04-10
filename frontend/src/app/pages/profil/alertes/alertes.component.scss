@@ -1,0 +1,145 @@
+.alertes-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+
+  h2 {
+    margin: 0;
+  }
+}
+
+.error {
+  color: #f44336;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  background: #ffebee;
+  border-radius: 4px;
+}
+
+.config-section, .history-section {
+  margin-bottom: 2rem;
+
+  h3 {
+    margin-bottom: 1rem;
+    color: #333;
+  }
+}
+
+.alerts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.alert-card {
+  .alert-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .alert-main {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    div {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .alert-detail {
+      font-size: 0.85rem;
+      color: #666;
+    }
+
+    .alert-inactive {
+      font-size: 0.8rem;
+      color: #f44336;
+      font-style: italic;
+    }
+  }
+
+  .alert-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .alert-meta {
+    font-size: 0.8rem;
+    color: #999;
+    margin-top: 0.5rem;
+  }
+}
+
+.create-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  .limit-msg {
+    color: #f44336;
+    font-size: 0.9rem;
+  }
+}
+
+.create-form {
+  margin-top: 1rem;
+
+  h4 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+  }
+
+  mat-form-field {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-error {
+    color: #f44336;
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+}
+
+.empty {
+  color: #999;
+  font-style: italic;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th, td {
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  th {
+    font-weight: 500;
+    color: #666;
+    font-size: 0.85rem;
+  }
+
+  td {
+    font-size: 0.9rem;
+  }
+}

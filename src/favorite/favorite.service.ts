@@ -89,6 +89,12 @@ export class FavoriteService {
       where: { id: favori.id },
     });
 
+    // Deactivate alerts for this commune
+    await this.prisma.alert.updateMany({
+      where: { userId, communeId },
+      data: { active: false },
+    });
+
     await this.deactivateIfNoMoreFavorites(communeId);
 
     return { message: 'Favori supprimé' };

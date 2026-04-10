@@ -31,6 +31,9 @@ describe('FavoriteService', () => {
               update: jest.fn(),
               updateMany: jest.fn(),
             },
+            alert: {
+              updateMany: jest.fn().mockResolvedValue({ count: 0 }),
+            },
           },
         },
       ],

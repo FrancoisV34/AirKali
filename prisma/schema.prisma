@@ -22,6 +22,18 @@ enum CollecteStatut {
   ERROR
 }
 
+enum AlertType {
+  AIR
+  METEO
+}
+
+enum AlertPalier {
+  AIR_MOYEN
+  AIR_MAUVAIS
+  AIR_TRES_MAUVAIS
+  METEO_SEVERE
+}
+
 model User {
   id             Int            @id @default(autoincrement())
   email          String         @unique
@@ -43,6 +55,8 @@ model User {
   notifications  Notification[]
   suspensions    SuspensionLog[] @relation("UserSuspensions")
   adminActions   SuspensionLog[] @relation("AdminActions")
+  alerts         Alert[]
+  alertLogs      AlertLog[]
 }
 
 model Commune {
@@ -60,6 +74,8 @@ model Commune {
   donneesMeteo    DonneeMeteo[]
   favoris         Favori[]
   usersReference  User[]
+  alerts          Alert[]
+  alertLogs       AlertLog[]
 
   @@index([nom])
   @@index([codePostal])
@@ -87,6 +103,7 @@ model DonneeMeteo {
   pression    Float?
   humidite    Float?
   meteoCiel   String?
+  weatherCode Int?
   vitesseVent Float?
   dateHeure   DateTime
 
@@ -191,4 +208,43 @@ model SuspensionLog {
 
   user  User @relation("UserSuspensions", fields: [userId], references: [id], onDelete: Cascade)
   admin User @relation("AdminActions", fields: [adminId], references: [id])
+}
+
+model Alert {
+  id                Int          @id @default(autoincrement())
+  userId            Int
+  communeId         Int
+  type              AlertType
+  palier            AlertPalier
+  active            Boolean      @default(true)
+  wasUnderThreshold Boolean      @default(true)
+  lastTriggeredAt   DateTime?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  user    User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  commune Commune    @relation(fields: [communeId], references: [id], onDelete: Cascade)
+  logs    AlertLog[]
+
+  @@unique([userId, communeId, type])
+}
+
+model AlertLog {
+  id               Int          @id @default(autoincrement())
+  alertId          Int?
+  userId           Int
+  communeId        Int
+  type             AlertType
+  palier           AlertPalier?
+  valeurMesuree    Float
+  seuilDeclenche   Float
+  unite            String
+  officielle       Boolean      @default(false)
+  emailSent        Boolean      @default(false)
+  notificationSent Boolean      @default(false)
+  createdAt        DateTime     @default(now())
+
+  alert   Alert?  @relation(fields: [alertId], references: [id], onDelete: SetNull)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  commune Commune @relation(fields: [communeId], references: [id], onDelete: Cascade)
 }

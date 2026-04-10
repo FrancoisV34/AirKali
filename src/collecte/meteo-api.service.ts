@@ -8,6 +8,7 @@ export interface MeteoData {
   pression: number | null;
   humidite: number | null;
   meteoCiel: string | null;
+  weatherCode: number | null;
   vitesseVent: number | null;
   dateHeure: string;
 }
@@ -40,6 +41,7 @@ export class MeteoApiService {
         current.weather_code != null
           ? wmoCodeToText(current.weather_code)
           : null,
+      weatherCode: current.weather_code ?? null,
       vitesseVent: current.wind_speed_10m ?? null,
       dateHeure: current.time,
     };

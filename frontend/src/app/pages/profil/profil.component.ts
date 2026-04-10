@@ -21,6 +21,7 @@ import {
 } from '../../core/services/auth.service';
 import { Favorite, FavoriteService } from '../../core/services/favorite.service';
 import { Commune, CommuneService } from '../../core/services/commune.service';
+import { RouterModule } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
 import { SuspensionHistoryComponent } from '../admin/suspension-history/suspension-history.component';
@@ -39,6 +40,7 @@ import { SuspensionHistoryComponent } from '../admin/suspension-history/suspensi
     MatCardModule,
     MatDialogModule,
     MatListModule,
+    RouterModule,
     SuspensionHistoryComponent,
   ],
   templateUrl: './profil.component.html',

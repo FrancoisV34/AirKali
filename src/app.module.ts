@@ -16,6 +16,7 @@ import { VoteModule } from './vote/vote.module';
 import { NotificationModule } from './notification/notification.module';
 import { MailModule } from './mail/mail.module';
 import { AdminModule } from './admin/admin.module';
+import { AlertModule } from './alert/alert.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { AdminModule } from './admin/admin.module';
     VoteModule,
     NotificationModule,
     AdminModule,
+    AlertModule,
   ],
 })
 export class AppModule {}
