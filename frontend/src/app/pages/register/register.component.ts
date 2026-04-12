@@ -50,7 +50,9 @@ export class RegisterComponent {
         username: ['', [Validators.required]],
         nom: ['', [Validators.required]],
         prenom: ['', [Validators.required]],
-        password: ['', [Validators.required, Validators.minLength(6)]],
+        password: ['', [Validators.required, Validators.pattern(
+          /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{}|;:,.<>?])[A-Za-z\d!@#$%^&*()_+\-=\[\]{}|;:,.<>?]{8,}$/
+        )]],
         confirmPassword: ['', [Validators.required]],
       },
       { validators: this.passwordMatchValidator },
@@ -68,18 +70,21 @@ export class RegisterComponent {
     return null;
   }
 
-  get passwordStrength(): { level: string; value: number; color: string } {
+  get passwordCriteria(): { label: string; valid: boolean }[] {
     const password = this.form.get('password')?.value || '';
-    let score = 0;
+    return [
+      { label: '8 caractères minimum', valid: password.length >= 8 },
+      { label: '1 lettre majuscule', valid: /[A-Z]/.test(password) },
+      { label: '1 chiffre', valid: /\d/.test(password) },
+      { label: '1 caractère spécial', valid: /[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/.test(password) },
+    ];
+  }
 
-    if (password.length >= 6) score++;
-    if (password.length >= 10) score++;
-    if (/[A-Z]/.test(password)) score++;
-    if (/[0-9]/.test(password)) score++;
-    if (/[^A-Za-z0-9]/.test(password)) score++;
+  get passwordStrength(): { level: string; value: number; color: string } {
+    const validCount = this.passwordCriteria.filter(c => c.valid).length;
 
-    if (score <= 1) return { level: 'Faible', value: 20, color: 'warn' };
-    if (score <= 3) return { level: 'Moyen', value: 55, color: 'accent' };
+    if (validCount <= 1) return { level: 'Faible', value: 20, color: 'warn' };
+    if (validCount <= 3) return { level: 'Moyen', value: 55, color: 'accent' };
     return { level: 'Fort', value: 100, color: 'primary' };
   }
 

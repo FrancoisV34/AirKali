@@ -42,9 +42,9 @@ describe('AuthService', () => {
     const registerDto = {
       email: 'test@test.com',
       username: 'testuser',
-      firstName: 'Test',
-      lastName: 'User',
-      password: 'password123',
+      nom: 'User',
+      prenom: 'Test',
+      password: 'Password1!',
     };
 
     it('should create a user and return a JWT', async () => {
@@ -89,7 +89,7 @@ describe('AuthService', () => {
       );
     });
 
-    it('should hash the password before storing', async () => {
+    it('should hash the password with bcrypt salt rounds 12', async () => {
       (prisma.user.findFirst as jest.Mock).mockResolvedValue(null);
       (prisma.user.create as jest.Mock).mockResolvedValue({
         id: 1,
@@ -101,12 +101,12 @@ describe('AuthService', () => {
       await service.register(registerDto);
 
       const createCall = (prisma.user.create as jest.Mock).mock.calls[0][0];
-      expect(createCall.data.password).not.toBe(registerDto.password);
-      const isHashed = await bcrypt.compare(
-        registerDto.password,
-        createCall.data.password,
-      );
-      expect(isHashed).toBe(true);
+      const hashedPassword = createCall.data.password;
+      expect(hashedPassword).not.toBe(registerDto.password);
+      // bcrypt hash encodes rounds in the hash: $2b$12$...
+      expect(hashedPassword).toMatch(/^\$2[aby]\$12\$/);
+      const isValid = await bcrypt.compare(registerDto.password, hashedPassword);
+      expect(isValid).toBe(true);
     });
   });
 

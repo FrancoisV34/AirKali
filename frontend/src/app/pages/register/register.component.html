@@ -59,12 +59,18 @@
       <mat-error *ngIf="form.get('password')?.hasError('required')">
         Le mot de passe est requis
       </mat-error>
-      <mat-error *ngIf="form.get('password')?.hasError('minlength')">
-        Minimum 6 caractères
+      <mat-error *ngIf="form.get('password')?.hasError('pattern')">
+        Le mot de passe doit contenir au moins 8 caractères, une majuscule, un chiffre et un caractère spécial
       </mat-error>
     </mat-form-field>
 
     <div class="password-strength" *ngIf="form.get('password')?.value">
+      <ul class="password-checklist">
+        <li *ngFor="let criterion of passwordCriteria" [class.valid]="criterion.valid" [class.invalid]="!criterion.valid">
+          <mat-icon class="criterion-icon">{{ criterion.valid ? 'check_circle' : 'cancel' }}</mat-icon>
+          {{ criterion.label }}
+        </li>
+      </ul>
       <mat-progress-bar
         mode="determinate"
         [value]="passwordStrength.value"

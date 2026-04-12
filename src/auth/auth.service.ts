@@ -32,7 +32,7 @@ export class AuthService {
       throw new ConflictException('Username already in use');
     }
 
-    const hashedPassword = await bcrypt.hash(dto.password, 10);
+    const hashedPassword = await bcrypt.hash(dto.password, 12);
 
     const user = await this.prisma.user.create({
       data: {
