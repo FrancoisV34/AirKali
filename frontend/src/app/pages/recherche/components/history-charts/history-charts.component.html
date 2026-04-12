@@ -36,6 +36,54 @@
   <div *ngIf="loading" class="chart-loading">
     Chargement des données historiques...
   </div>
+
+  <!-- Export -->
+  <div class="export-section" *ngIf="authService.isAuthenticated()">
+    <button mat-stroked-button color="primary" (click)="toggleExportPanel()">
+      <mat-icon>download</mat-icon>
+      Exporter
+    </button>
+
+    <div class="export-panel" *ngIf="showExportPanel">
+      <div class="export-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Type de données</mat-label>
+          <mat-select [(ngModel)]="exportType">
+            <mat-option value="air">Qualité de l'air</mat-option>
+            <mat-option value="meteo">Météo</mat-option>
+            <mat-option value="both">Les deux</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Format</mat-label>
+          <mat-select [(ngModel)]="exportFormat">
+            <mat-option value="csv">CSV</mat-option>
+            <mat-option value="pdf">PDF</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="export-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Date début</mat-label>
+          <input matInput type="date" [(ngModel)]="exportFrom" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Date fin</mat-label>
+          <input matInput type="date" [(ngModel)]="exportTo" />
+        </mat-form-field>
+      </div>
+
+      <div class="export-error" *ngIf="exportError">{{ exportError }}</div>
+
+      <button mat-raised-button color="primary" (click)="onExport()">
+        <mat-icon>file_download</mat-icon>
+        Télécharger
+      </button>
+    </div>
+  </div>
 </div>
 
 <div class="charts-section no-active" *ngIf="communeId && !isActive">

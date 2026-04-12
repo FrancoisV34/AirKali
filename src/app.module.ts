@@ -18,6 +18,7 @@ import { NotificationModule } from './notification/notification.module';
 import { MailModule } from './mail/mail.module';
 import { AdminModule } from './admin/admin.module';
 import { AlertModule } from './alert/alert.module';
+import { ExportModule } from './export/export.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { AlertModule } from './alert/alert.module';
     NotificationModule,
     AdminModule,
     AlertModule,
+    ExportModule,
   ],
 })
 export class AppModule {}

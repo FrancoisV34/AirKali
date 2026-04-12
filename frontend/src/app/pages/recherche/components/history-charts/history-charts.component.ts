@@ -1,6 +1,12 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { MatInputModule } from '@angular/material/input';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration } from 'chart.js';
 import {
@@ -11,11 +17,23 @@ import {
   MeteoHistory,
   MeteoService,
 } from '../../../../core/services/meteo.service';
+import { ExportService } from '../../../../core/services/export.service';
+import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-history-charts',
   standalone: true,
-  imports: [CommonModule, MatButtonToggleModule, BaseChartDirective],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatButtonToggleModule,
+    MatButtonModule,
+    MatIconModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatInputModule,
+    BaseChartDirective,
+  ],
   templateUrl: './history-charts.component.html',
   styleUrl: './history-charts.component.scss',
 })
@@ -26,6 +44,14 @@ export class HistoryChartsComponent implements OnChanges {
   chartType: 'air' | 'meteo' = 'air';
   period: '7' | '30' = '7';
   loading = false;
+
+  // Export
+  showExportPanel = false;
+  exportType: 'air' | 'meteo' | 'both' = 'air';
+  exportFormat: 'csv' | 'pdf' = 'csv';
+  exportFrom = '';
+  exportTo = '';
+  exportError = '';
 
   airChartData: ChartConfiguration<'line'>['data'] | null = null;
   meteoChartData: ChartConfiguration<'line'>['data'] | null = null;
@@ -41,7 +67,15 @@ export class HistoryChartsComponent implements OnChanges {
   constructor(
     private airService: AirQualityService,
     private meteoService: MeteoService,
-  ) {}
+    private exportService: ExportService,
+    public authService: AuthService,
+  ) {
+    const today = new Date();
+    const monthAgo = new Date();
+    monthAgo.setDate(today.getDate() - 30);
+    this.exportTo = today.toISOString().split('T')[0];
+    this.exportFrom = monthAgo.toISOString().split('T')[0];
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['communeId'] || changes['isActive']) {
@@ -184,5 +218,41 @@ export class HistoryChartsComponent implements OnChanges {
               y: { title: { display: true, text: 'Valeur' } },
             },
     };
+  }
+
+  toggleExportPanel(): void {
+    this.showExportPanel = !this.showExportPanel;
+    this.exportError = '';
+  }
+
+  onExport(): void {
+    this.exportError = '';
+
+    if (!this.exportFrom || !this.exportTo) {
+      this.exportError = 'Veuillez sélectionner une période';
+      return;
+    }
+
+    const from = new Date(this.exportFrom);
+    const to = new Date(this.exportTo);
+
+    if (from > to) {
+      this.exportError = 'La date de début doit être antérieure à la date de fin';
+      return;
+    }
+
+    const diffDays = (to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24);
+    if (diffDays > 31) {
+      this.exportError = 'La période ne peut pas dépasser 1 mois';
+      return;
+    }
+
+    this.exportService.exportData(
+      this.communeId!,
+      this.exportFormat,
+      this.exportType,
+      this.exportFrom,
+      this.exportTo,
+    );
   }
 }
