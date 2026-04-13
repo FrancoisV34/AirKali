@@ -20,6 +20,7 @@ import { TopicService } from './topic.service';
 import { CreateTopicDto } from './dto/create-topic.dto';
 import { UpdateTopicDto } from './dto/update-topic.dto';
 import { Role } from '../common/enums/role.enum';
+import { ApiTags } from '@nestjs/swagger';
 
 class ModerateBodyDto {
   @IsOptional()
@@ -33,6 +34,7 @@ interface JwtUser {
   role: Role;
 }
 
+@ApiTags('Forum — Topics')
 @Controller('topics')
 export class TopicController {
   constructor(private topicService: TopicService) {}

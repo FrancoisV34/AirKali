@@ -1,0 +1,105 @@
+<div class="admin-alertes">
+  <h2>Gestion des alertes manuelles</h2>
+
+  <!-- Formulaire de creation -->
+  <mat-card class="create-card">
+    <mat-card-header>
+      <mat-card-title>Nouvelle alerte</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Rechercher une commune</mat-label>
+          <input
+            matInput
+            [(ngModel)]="searchCommune"
+            (input)="searchCommunes()"
+            placeholder="Tapez au moins 2 caractères..."
+          />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" *ngIf="communes.length > 0">
+          <mat-label>Commune</mat-label>
+          <mat-select [(ngModel)]="selectedCommuneId">
+            <mat-option *ngFor="let c of communes" [value]="c.id">
+              {{ c.nom }} ({{ c.codePostal }})
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Palier</mat-label>
+          <mat-select [(ngModel)]="selectedPalier">
+            <mat-option *ngFor="let p of paliers" [value]="p.value">
+              {{ p.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="message-field">
+          <mat-label>Message personnalise (optionnel)</mat-label>
+          <input matInput [(ngModel)]="message" />
+        </mat-form-field>
+      </div>
+
+      <div class="form-error" *ngIf="formError">{{ formError }}</div>
+      <div class="form-success" *ngIf="formSuccess">{{ formSuccess }}</div>
+
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="onCreate()"
+        [disabled]="creating"
+      >
+        <mat-icon>add_alert</mat-icon>
+        Creer l'alerte
+      </button>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Tableau des alertes -->
+  <h3>Alertes existantes</h3>
+
+  <div *ngIf="loading" class="loading">
+    <mat-spinner diameter="32"></mat-spinner>
+    Chargement...
+  </div>
+
+  <div class="alerts-table" *ngIf="!loading">
+    <div class="table-header">
+      <span>Commune</span>
+      <span>Palier</span>
+      <span>Message</span>
+      <span>Creee le</span>
+      <span>Expire le</span>
+      <span>Statut</span>
+      <span>Action</span>
+    </div>
+
+    <div class="table-row" *ngFor="let alert of alerts">
+      <span>{{ alert.commune?.nom || '-' }}</span>
+      <span>{{ alert.palier }}</span>
+      <span class="message-cell">{{ alert.message || '-' }}</span>
+      <span>{{ alert.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+      <span>{{ alert.expiresAt | date:'dd/MM/yyyy HH:mm' }}</span>
+      <span [class]="getStatutClass(alert.statut)">{{ alert.statut }}</span>
+      <span>
+        <button
+          mat-icon-button
+          color="warn"
+          *ngIf="alert.statut === 'Active'"
+          (click)="onClose(alert.id)"
+          title="Cloturer"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
+      </span>
+    </div>
+
+    <div *ngIf="alerts.length === 0" class="no-alerts">
+      Aucune alerte manuelle
+    </div>
+  </div>
+</div>

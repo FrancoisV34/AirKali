@@ -6,8 +6,10 @@ import {
   ParseIntPipe,
   Query,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { CommuneService } from './commune.service';
 
+@ApiTags('Communes')
 @Controller('communes')
 export class CommuneController {
   constructor(private communeService: CommuneService) {}

@@ -10,6 +10,7 @@ import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { VoteService } from './vote.service';
 import { CreateVoteDto } from './dto/create-vote.dto';
 import { Role } from '../common/enums/role.enum';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 
 interface JwtUser {
   id: number;
@@ -17,6 +18,8 @@ interface JwtUser {
   role: Role;
 }
 
+@ApiTags('Votes')
+@ApiBearerAuth()
 @Controller('votes')
 @UseGuards(JwtAuthGuard)
 export class VoteController {

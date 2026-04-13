@@ -10,10 +10,13 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { AlertService } from './alert.service';
 import { CreateAlertDto } from './dto/create-alert.dto';
 
+@ApiTags('Alertes automatiques')
+@ApiBearerAuth()
 @Controller('alerts')
 @UseGuards(JwtAuthGuard)
 export class AlertController {

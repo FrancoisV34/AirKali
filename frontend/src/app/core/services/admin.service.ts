@@ -26,6 +26,25 @@ export interface SuspensionLog {
   createdAt: string;
 }
 
+export interface ManualAlertItem {
+  id: number;
+  communeId: number;
+  palier: string;
+  message: string | null;
+  expiresAt: string;
+  closedAt: string | null;
+  createdAt: string;
+  statut: string;
+  commune?: { nom: string };
+  admin?: { nom: string; prenom: string };
+}
+
+export interface CreateManualAlertData {
+  communeId: number;
+  palier: string;
+  message?: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AdminService {
   constructor(private api: ApiService) {}
@@ -52,5 +71,17 @@ export class AdminService {
 
   getMySuspensionHistory(): Observable<SuspensionLog[]> {
     return this.api.get<SuspensionLog[]>('/user/suspension-history');
+  }
+
+  getManualAlerts(): Observable<ManualAlertItem[]> {
+    return this.api.get<ManualAlertItem[]>('/admin/alertes');
+  }
+
+  createManualAlert(data: CreateManualAlertData): Observable<ManualAlertItem> {
+    return this.api.post<ManualAlertItem>('/admin/alertes', data);
+  }
+
+  closeManualAlert(id: number): Observable<ManualAlertItem> {
+    return this.api.patch<ManualAlertItem>(`/admin/alertes/${id}/close`, {});
   }
 }

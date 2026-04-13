@@ -57,6 +57,7 @@ model User {
   adminActions   SuspensionLog[] @relation("AdminActions")
   alerts         Alert[]
   alertLogs      AlertLog[]
+  manualAlerts   ManualAlert[]
 }
 
 model Commune {
@@ -76,6 +77,7 @@ model Commune {
   usersReference  User[]
   alerts          Alert[]
   alertLogs       AlertLog[]
+  manualAlerts    ManualAlert[]
 
   @@index([nom])
   @@index([codePostal])
@@ -247,4 +249,21 @@ model AlertLog {
   alert   Alert?  @relation(fields: [alertId], references: [id], onDelete: SetNull)
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   commune Commune @relation(fields: [communeId], references: [id], onDelete: Cascade)
+}
+
+model ManualAlert {
+  id          Int          @id @default(autoincrement())
+  communeId   Int
+  palier      AlertPalier
+  message     String?      @db.Text
+  createdBy   Int
+  expiresAt   DateTime
+  closedAt    DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  commune Commune @relation(fields: [communeId], references: [id], onDelete: Cascade)
+  admin   User    @relation(fields: [createdBy], references: [id])
+
+  @@index([communeId])
 }

@@ -1,6 +1,8 @@
 import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { MeteoService } from './meteo.service';
 
+@ApiTags('Météo')
 @Controller('communes/:id/meteo')
 export class MeteoController {
   constructor(private meteoService: MeteoService) {}

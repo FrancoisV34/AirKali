@@ -1,9 +1,12 @@
 import { Controller, Get, Param, ParseIntPipe, Query, Res, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Response } from 'express';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { ExportService } from './export.service';
 import { ExportFormat, ExportQueryDto, ExportType } from './dto/export-query.dto';
 
+@ApiTags('Export')
+@ApiBearerAuth()
 @Controller('communes')
 export class ExportController {
   constructor(private exportService: ExportService) {}

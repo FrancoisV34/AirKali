@@ -29,6 +29,46 @@
   }
 }
 
+.manual-alerts {
+  margin-bottom: 12px;
+
+  .alert-banner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 6px;
+    margin-bottom: 6px;
+    font-size: 13px;
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+
+    &.alert-air_moyen {
+      background: #fff3e0;
+      color: #e65100;
+    }
+
+    &.alert-air_mauvais {
+      background: #fbe9e7;
+      color: #bf360c;
+    }
+
+    &.alert-air_tres_mauvais {
+      background: #ffebee;
+      color: #b71c1c;
+    }
+
+    &.alert-meteo_severe {
+      background: #e3f2fd;
+      color: #0d47a1;
+    }
+  }
+}
+
 .commune-info {
   color: #666;
   margin-bottom: 12px;

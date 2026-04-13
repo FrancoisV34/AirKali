@@ -1,6 +1,17 @@
 <div class="data-panel" *ngIf="commune; else emptyState">
   <h3>{{ commune.nom }} <small>({{ commune.codePostal }})</small></h3>
 
+  <!-- Alertes manuelles actives -->
+  <div class="manual-alerts" *ngIf="manualAlerts.length > 0">
+    <div class="alert-banner" *ngFor="let alert of manualAlerts" [class]="'alert-' + alert.palier.toLowerCase()">
+      <mat-icon>{{ getPalierIcon(alert.palier) }}</mat-icon>
+      <div class="alert-content">
+        <strong>{{ getPalierLabel(alert.palier) }}</strong>
+        <span *ngIf="alert.message"> — {{ alert.message }}</span>
+      </div>
+    </div>
+  </div>
+
   <div class="commune-info" *ngIf="commune.population">
     <span>Population : {{ commune.population | number }}</span>
   </div>

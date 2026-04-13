@@ -19,6 +19,7 @@ import { MailModule } from './mail/mail.module';
 import { AdminModule } from './admin/admin.module';
 import { AlertModule } from './alert/alert.module';
 import { ExportModule } from './export/export.module';
+import { ManualAlertModule } from './manual-alert/manual-alert.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { ExportModule } from './export/export.module';
     AdminModule,
     AlertModule,
     ExportModule,
+    ManualAlertModule,
   ],
 })
 export class AppModule {}

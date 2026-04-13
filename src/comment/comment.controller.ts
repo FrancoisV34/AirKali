@@ -20,6 +20,7 @@ import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { Role } from '../common/enums/role.enum';
+import { ApiTags } from '@nestjs/swagger';
 
 class ModerateBodyDto {
   @IsOptional()
@@ -33,6 +34,7 @@ interface JwtUser {
   role: Role;
 }
 
+@ApiTags('Forum — Commentaires')
 @Controller('topics/:topicId/comments')
 export class CommentController {
   constructor(private commentService: CommentService) {}
