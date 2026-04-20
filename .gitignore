@@ -9,6 +9,8 @@ dist/
 
 # Prisma
 /generated/prisma
+*.db
+*.db-journal
 
 # IDE
 .idea/

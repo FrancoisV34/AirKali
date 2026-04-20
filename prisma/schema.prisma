@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "sqlite"
 }
 
 enum Role {
@@ -66,8 +66,8 @@ model Commune {
   codePostal  String
   codeInsee   String    @unique
   population  Int?
-  latitude    Decimal   @db.Decimal(9, 6)
-  longitude   Decimal   @db.Decimal(9, 6)
+  latitude    Decimal
+  longitude   Decimal
   active      Boolean   @default(false)
   activatedAt DateTime?
 
@@ -137,15 +137,15 @@ model LogCollecte {
 
 model Category {
   id        Int      @id @default(autoincrement())
-  name      String   @unique @db.VarChar(100)
+  name      String   @unique
   createdAt DateTime @default(now())
   topics    Topic[]
 }
 
 model Topic {
   id         Int       @id @default(autoincrement())
-  title      String    @db.VarChar(255)
-  content    String    @db.Text
+  title      String
+  content    String
   userId     Int
   categoryId Int?
   status     String    @default("visible")
@@ -161,7 +161,7 @@ model Topic {
 
 model Comment {
   id        Int       @id @default(autoincrement())
-  content   String    @db.Text
+  content   String
   userId    Int
   topicId   Int
   parentId  Int?
@@ -179,7 +179,7 @@ model Comment {
 model Notification {
   id        Int       @id @default(autoincrement())
   userId    Int
-  message   String    @db.Text
+  message   String
   reason    String?
   readAt    DateTime?
   createdAt DateTime  @default(now())
@@ -205,7 +205,7 @@ model SuspensionLog {
   userId    Int
   adminId   Int
   action    String
-  motif     String?  @db.Text
+  motif     String?
   createdAt DateTime @default(now())
 
   user  User @relation("UserSuspensions", fields: [userId], references: [id], onDelete: Cascade)
@@ -255,7 +255,7 @@ model ManualAlert {
   id          Int          @id @default(autoincrement())
   communeId   Int
   palier      AlertPalier
-  message     String?      @db.Text
+  message     String?
   createdBy   Int
   expiresAt   DateTime
   closedAt    DateTime?
