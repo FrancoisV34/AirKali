@@ -35,15 +35,19 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }));
 
-  // Swagger
-  const swaggerConfig = new DocumentBuilder()
-    .setTitle('Breath For All API')
-    .setDescription('API de la plateforme Breath For All — qualité de l\'air et météo')
-    .setVersion('1.0')
-    .addBearerAuth()
-    .build();
-  const document = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('api-docs', app, document);
+  // Swagger (disabled in production)
+  if (process.env.NODE_ENV !== 'production') {
+    const swaggerConfig = new DocumentBuilder()
+      .setTitle('Breath For All API')
+      .setDescription('API de la plateforme Breath For All — qualité de l\'air et météo')
+      .setVersion('1.0')
+      .addBearerAuth()
+      .build();
+    const document = SwaggerModule.createDocument(app, swaggerConfig);
+    SwaggerModule.setup('api-docs', app, document, {
+      useGlobalPrefix: false,
+    });
+  }
 
   await app.listen(process.env.PORT ?? 3000);
 }
