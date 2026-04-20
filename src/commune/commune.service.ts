@@ -93,7 +93,7 @@ export class CommuneService {
     }
 
     return this.prisma.commune.findMany({
-      where: { codePostal, active: true },
+      where: { codePostal },
       select: {
         id: true,
         nom: true,

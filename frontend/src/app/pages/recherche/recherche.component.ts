@@ -67,13 +67,7 @@ export class RechercheComponent implements OnInit {
         if (profile.communeId) {
           this.communeService.getCommuneById(profile.communeId).subscribe({
             next: (commune) => {
-              setTimeout(() => {
-                this.mapComponent?.centerOn(
-                  Number(commune.latitude),
-                  Number(commune.longitude),
-                  12,
-                );
-              }, 150);
+              this.onCommuneSelected(commune);
             },
           });
         }
@@ -82,7 +76,7 @@ export class RechercheComponent implements OnInit {
   }
 
   onCommuneSelected(commune: Commune): void {
-    this.selectedCommune = commune;
+    this.selectedCommune = { ...commune, active: commune.active ?? true };
     this.airData = null;
     this.meteoData = null;
 

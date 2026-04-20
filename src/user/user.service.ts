@@ -122,8 +122,8 @@ export class UserService {
         where: { id: dto.communeId },
       });
 
-      if (!commune || !commune.active) {
-        throw new BadRequestException('Commune introuvable ou inactive');
+      if (!commune) {
+        throw new BadRequestException('Commune introuvable');
       }
 
       // Retirer l'ancienne commune des favoris si différente
